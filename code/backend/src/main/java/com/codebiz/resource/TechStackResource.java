@@ -85,4 +85,17 @@ public class TechStackResource {
         }
         return Response.noContent().build();
     }
+
+    // PAGINATION
+    @GET
+    @Path("/page")
+    public List<TechStack> paginate(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+
+        return TechStack.findAll()
+                .page(page, size)
+                .list();
+    }
+
 }

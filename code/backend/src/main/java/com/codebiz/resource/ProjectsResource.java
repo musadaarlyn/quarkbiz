@@ -67,4 +67,17 @@ public class ProjectsResource {
 
         return Response.noContent().build();
     }
+
+    // PAGINATION
+    @GET
+    @Path("/page")
+    public List<Projects> paginate(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+
+        return Projects.findAll()
+                .page(page, size)
+                .list();
+    }
+
 }
