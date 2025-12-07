@@ -1,5 +1,8 @@
 package com.codebiz.resource;
 
+import io.quarkus.panache.common.Sort;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+
 import com.codebiz.model.TechStack;
 import com.codebiz.model.TechStackCategory;
 import jakarta.transaction.Transactional;
@@ -46,6 +49,55 @@ public class TechStackResource {
         return TechStack.findById(id);
     }
 
+    // PAGINATION
+    @GET
+    @Path("/page")
+    public List<TechStack> paginate(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+
+        return TechStack.findAll()
+                .page(page, size)
+                .list();
+    }
+
+    // SEARCH AND FILTER
+    @GET
+    @Path("/search")
+    public List<TechStack> search(
+            @QueryParam("name") String name,
+            @QueryParam("categoryId") Long categoryId,
+            @QueryParam("sort") @DefaultValue("id") String sort,
+            @QueryParam("direction") @DefaultValue("asc") String direction,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+
+        Sort sortOrder = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sort).descending()
+                : Sort.by(sort).ascending();
+
+        PanacheQuery<TechStack> pq;
+
+        // Build filters dynamically
+        if (name != null && !name.isEmpty() && categoryId != null) {
+            pq = TechStack.find(
+                    "tsName LIKE ?1 AND categoryId = ?2",
+                    sortOrder,
+                    "%" + name + "%",
+                    categoryId
+            );
+        } else if (name != null && !name.isEmpty()) {
+            pq = TechStack.find("tsName LIKE ?1", sortOrder, "%" + name + "%");
+        } else if (categoryId != null) {
+            pq = TechStack.find("categoryId = ?1", sortOrder, categoryId);
+        } else {
+            pq = TechStack.findAll(sortOrder);
+        }
+
+        return pq.page(page, size).list();
+    }
+
+
     // UPDATE
     @PUT
     @Path("/{id}")
@@ -84,18 +136,6 @@ public class TechStackResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.noContent().build();
-    }
-
-    // PAGINATION
-    @GET
-    @Path("/page")
-    public List<TechStack> paginate(
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size) {
-
-        return TechStack.findAll()
-                .page(page, size)
-                .list();
     }
 
 }

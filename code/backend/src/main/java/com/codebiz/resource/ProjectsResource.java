@@ -1,5 +1,8 @@
 package com.codebiz.resource;
 
+import io.quarkus.panache.common.Sort;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+
 import com.codebiz.model.Projects;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -32,6 +35,53 @@ public class ProjectsResource {
     public Projects getById(@PathParam("id") Long id) {
         return Projects.findById(id);
     }
+
+    // PAGINATION
+    @GET
+    @Path("/page")
+    public List<Projects> paginate(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+
+        return Projects.findAll()
+                .page(page, size)
+                .list();
+    }
+
+    // SEARCH AND FILTER
+    @GET
+    @Path("/search")
+    public List<Projects> search(
+            @QueryParam("name") String name,
+            @QueryParam("status") String status,
+            @QueryParam("sort") @DefaultValue("id") String sort,
+            @QueryParam("direction") @DefaultValue("asc") String direction,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+
+        Sort sortOrder = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sort).descending()
+                : Sort.by(sort).ascending();
+
+        PanacheQuery<Projects> pq;
+
+        if (name != null && !name.isEmpty() && status != null) {
+            pq = Projects.find("projName LIKE ?1 AND status = ?2",
+                    sortOrder,
+                    "%" + name + "%",
+                    status
+            );
+        } else if (name != null && !name.isEmpty()) {
+            pq = Projects.find("projName LIKE ?1", sortOrder, "%" + name + "%");
+        } else if (status != null) {
+            pq = Projects.find("status = ?1", sortOrder, status);
+        } else {
+            pq = Projects.findAll(sortOrder);
+        }
+
+        return pq.page(page, size).list();
+    }
+
 
     // UPDATE
     @PUT
@@ -66,18 +116,6 @@ public class ProjectsResource {
         }
 
         return Response.noContent().build();
-    }
-
-    // PAGINATION
-    @GET
-    @Path("/page")
-    public List<Projects> paginate(
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size) {
-
-        return Projects.findAll()
-                .page(page, size)
-                .list();
     }
 
 }

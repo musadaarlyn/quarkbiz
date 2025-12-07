@@ -1,6 +1,9 @@
 package com.codebiz.resource;
 
 import com.codebiz.model.TechStackCategory;
+
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Sort;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -33,6 +36,44 @@ public class TechStackCategoryResource {
         return TechStackCategory.findById(id);
     }
 
+    // PAGINATION
+    @GET
+    @Path("/page")
+    public List<TechStackCategory> paginate(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+
+        return TechStackCategory.findAll()
+                .page(page, size)
+                .list();
+    }
+
+    // SEARCH AND FILTER
+    @GET
+    @Path("/search")
+    public List<TechStackCategory> search(
+            @QueryParam("name") String name,
+            @QueryParam("sort") @DefaultValue("id") String sort,
+            @QueryParam("direction") @DefaultValue("asc") String direction,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+
+        // Build the Sort object from query params
+        Sort sortOrder = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sort).descending()
+                : Sort.by(sort).ascending();
+
+        PanacheQuery<TechStackCategory> pq;
+
+        if (name != null && !name.isEmpty()) {
+            pq = TechStackCategory.find("tscName LIKE ?1", sortOrder, "%" + name + "%");
+        } else {
+            pq = TechStackCategory.findAll(sortOrder);
+        }
+
+        return pq.page(page, size).list();
+    }
+
     // UPDATE 
     @PUT
     @Path("/{id}")
@@ -59,18 +100,6 @@ public class TechStackCategoryResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.noContent().build();
-    }
-
-    // PAGINATION
-    @GET
-    @Path("/page")
-    public List<TechStackCategory> paginate(
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size) {
-
-        return TechStackCategory.findAll()
-                .page(page, size)
-                .list();
     }
 
 }
