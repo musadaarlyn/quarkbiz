@@ -34,4 +34,7 @@ public class Projects extends PanacheEntityBase {
 
     @Column(name = "createdAt")
     public LocalDateTime createdAt;
+
+    @Column(name = "updatedAt")
+    public LocalDateTime updatedAt;
 }

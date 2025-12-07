@@ -1,13 +1,13 @@
 package com.codebiz.resource;
 
 import com.codebiz.model.TechStackCategory;
+import com.codebiz.service.TechStackCategoryService;
 
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.quarkus.panache.common.Sort;
-import jakarta.transaction.Transactional;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 
 @Path("/categories")
@@ -15,25 +15,30 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class TechStackCategoryResource {
 
-    // CREATE 
+    @Inject
+    TechStackCategoryService service;
+
+    // CREATE
     @POST
-    @Transactional
-    public Response create(TechStackCategory category) {
-        category.persist();
-        return Response.status(Response.Status.CREATED).entity(category).build();
+    public Response create(TechStackCategory tsc) {
+        TechStackCategory created = service.create(tsc);
+        return Response.status(Response.Status.CREATED).entity(created).build();
     }
 
-    // READ ALL 
+    // READ ALL
     @GET
     public List<TechStackCategory> listAll() {
-        return TechStackCategory.listAll();
+        return service.listAll();
     }
 
     // READ BY ID
     @GET
     @Path("/{id}")
-    public TechStackCategory getById(@PathParam("id") Long id) {
-        return TechStackCategory.findById(id);
+    public Response findById(@PathParam("id") Long id) {
+        TechStackCategory cat = service.findById(id);
+        return cat == null
+                ? Response.status(Response.Status.NOT_FOUND).build()
+                : Response.ok(cat).build();
     }
 
     // PAGINATION
@@ -41,65 +46,41 @@ public class TechStackCategoryResource {
     @Path("/page")
     public List<TechStackCategory> paginate(
             @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size) {
-
-        return TechStackCategory.findAll()
-                .page(page, size)
-                .list();
+            @QueryParam("size") @DefaultValue("10") int size
+    ) {
+        return service.paginate(page, size);
     }
 
-    // SEARCH AND FILTER
+    // SEARCH + SORT
     @GET
     @Path("/search")
     public List<TechStackCategory> search(
             @QueryParam("name") String name,
-            @QueryParam("sort") @DefaultValue("id") String sort,
+            @QueryParam("sort") @DefaultValue("id") String sortField,
             @QueryParam("direction") @DefaultValue("asc") String direction,
             @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size) {
-
-        // Build the Sort object from query params
-        Sort sortOrder = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sort).descending()
-                : Sort.by(sort).ascending();
-
-        PanacheQuery<TechStackCategory> pq;
-
-        if (name != null && !name.isEmpty()) {
-            pq = TechStackCategory.find("tscName LIKE ?1", sortOrder, "%" + name + "%");
-        } else {
-            pq = TechStackCategory.findAll(sortOrder);
-        }
-
-        return pq.page(page, size).list();
+            @QueryParam("size") @DefaultValue("10") int size
+    ) {
+        return service.search(name, sortField, direction, page, size);
     }
 
-    // UPDATE 
+    // UPDATE
     @PUT
     @Path("/{id}")
-    @Transactional
-    public Response update(@PathParam("id") Long id, TechStackCategory updated) {
-        TechStackCategory category = TechStackCategory.findById(id);
-        if (category == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        category.tscName = updated.tscName;
-        category.tscDescription = updated.tscDescription;
-        
-        return Response.ok(category).build();
+    public Response update(@PathParam("id") Long id, TechStackCategory tsc) {
+        TechStackCategory updated = service.update(id, tsc);
+        return updated == null
+                ? Response.status(Response.Status.NOT_FOUND).build()
+                : Response.ok(updated).build();
     }
 
-    // DELETE 
+    // DELETE
     @DELETE
     @Path("/{id}")
-    @Transactional
     public Response delete(@PathParam("id") Long id) {
-        boolean deleted = TechStackCategory.deleteById(id);
-        if (!deleted) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.noContent().build();
+        boolean deleted = service.delete(id);
+        return deleted
+                ? Response.noContent().build()
+                : Response.status(Response.Status.NOT_FOUND).build();
     }
-
 }

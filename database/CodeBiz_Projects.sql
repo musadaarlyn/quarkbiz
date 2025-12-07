@@ -31,3 +31,15 @@ CREATE TABLE projects (
     endDate DATE,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- MOVING TO SERVICE LAYER ---
+-- ALTER TABLES (add updatedAt field)
+
+ALTER TABLE tech_stack_category
+ADD COLUMN updatedAt TIMESTAMP NULL DEFAULT NULL AFTER createdAt;
+
+ALTER TABLE tech_stack
+ADD COLUMN updatedAt TIMESTAMP NULL DEFAULT NULL AFTER createdAt;
+
+ALTER TABLE projects
+ADD COLUMN updatedAt TIMESTAMP NULL DEFAULT NULL AFTER createdAt;

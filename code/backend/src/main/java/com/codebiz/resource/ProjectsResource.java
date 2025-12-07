@@ -1,13 +1,13 @@
 package com.codebiz.resource;
 
-import io.quarkus.panache.common.Sort;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
-
 import com.codebiz.model.Projects;
-import jakarta.transaction.Transactional;
+import com.codebiz.service.ProjectsService;
+
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 
 @Path("/projects")
@@ -15,40 +15,53 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProjectsResource {
 
+    @Inject
+    ProjectsService service;
+
     // CREATE
     @POST
-    @Transactional
-    public Response create(Projects data) {
-        data.persist();
-        return Response.status(Response.Status.CREATED).entity(data).build();
+    public Response create(Projects project) {
+        Projects created = service.create(project);
+        return Response.status(Response.Status.CREATED).entity(created).build();
     }
 
     // READ ALL
     @GET
-    public List<Projects> listAll() {
-        return Projects.listAll();
+    public List<Projects> getAll() {
+        return service.getAll();
     }
 
     // READ BY ID
     @GET
     @Path("/{id}")
-    public Projects getById(@PathParam("id") Long id) {
-        return Projects.findById(id);
+    public Response findById(@PathParam("id") Long id) {
+        Projects p = service.findById(id);
+        return p == null
+                ? Response.status(Response.Status.NOT_FOUND).build()
+                : Response.ok(p).build();
     }
 
-    // PAGINATION
-    @GET
-    @Path("/page")
-    public List<Projects> paginate(
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size) {
-
-        return Projects.findAll()
-                .page(page, size)
-                .list();
+    // UPDATE
+    @PUT
+    @Path("/{id}")
+    public Response update(@PathParam("id") Long id, Projects data) {
+        Projects updated = service.update(id, data);
+        return updated == null
+                ? Response.status(Response.Status.NOT_FOUND).build()
+                : Response.ok(updated).build();
     }
 
-    // SEARCH AND FILTER
+    // DELETE
+    @DELETE
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) {
+        boolean deleted = service.delete(id);
+        return deleted
+                ? Response.noContent().build()
+                : Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    // SEARCH
     @GET
     @Path("/search")
     public List<Projects> search(
@@ -57,65 +70,8 @@ public class ProjectsResource {
             @QueryParam("sort") @DefaultValue("id") String sort,
             @QueryParam("direction") @DefaultValue("asc") String direction,
             @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size) {
-
-        Sort sortOrder = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sort).descending()
-                : Sort.by(sort).ascending();
-
-        PanacheQuery<Projects> pq;
-
-        if (name != null && !name.isEmpty() && status != null) {
-            pq = Projects.find("projName LIKE ?1 AND status = ?2",
-                    sortOrder,
-                    "%" + name + "%",
-                    status
-            );
-        } else if (name != null && !name.isEmpty()) {
-            pq = Projects.find("projName LIKE ?1", sortOrder, "%" + name + "%");
-        } else if (status != null) {
-            pq = Projects.find("status = ?1", sortOrder, status);
-        } else {
-            pq = Projects.findAll(sortOrder);
-        }
-
-        return pq.page(page, size).list();
+            @QueryParam("size") @DefaultValue("10") int size
+    ) {
+        return service.search(name, status, sort, direction, page, size);
     }
-
-
-    // UPDATE
-    @PUT
-    @Path("/{id}")
-    @Transactional
-    public Response update(@PathParam("id") Long id, Projects updated) {
-
-        Projects proj = Projects.findById(id);
-        if (proj == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        proj.projName = updated.projName;
-        proj.projDescription = updated.projDescription;
-        proj.techStackIds = updated.techStackIds;     // JSON array as String
-        proj.status = updated.status;
-        proj.startDate = updated.startDate;
-        proj.endDate = updated.endDate;
-
-        return Response.ok(proj).build();
-    }
-
-    // DELETE
-    @DELETE
-    @Path("/{id}")
-    @Transactional
-    public Response delete(@PathParam("id") Long id) {
-        boolean deleted = Projects.deleteById(id);
-
-        if (!deleted) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        return Response.noContent().build();
-    }
-
 }
