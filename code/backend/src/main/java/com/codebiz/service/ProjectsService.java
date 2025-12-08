@@ -1,78 +1,100 @@
 package com.codebiz.service;
 
+import com.codebiz.dto.projects.ProjectsRequestDTO;
+import com.codebiz.dto.projects.ProjectsResponseDTO;
+import com.codebiz.mapper.projects.ProjectsMapper;
 import com.codebiz.model.Projects;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
+
 import io.quarkus.panache.common.Sort;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ProjectsService {
 
-    public List<Projects> getAll() {
-        return Projects.listAll();
-    }
-
+    // CREATE
     @Transactional
-    public Projects create(Projects project) {
-        project.persist();
-        return project;
+    public ProjectsResponseDTO create(ProjectsRequestDTO dto) {
+
+        Projects entity = ProjectsMapper.toEntity(dto);
+        entity.createdAt = LocalDateTime.now();
+        entity.updatedAt = LocalDateTime.now();
+
+        entity.persist();
+        return ProjectsMapper.toDTO(entity);
     }
 
-    public Projects findById(Long id) {
-        return Projects.findById(id);
+    // READ ALL
+    public List<ProjectsResponseDTO> getAll() {
+        return Projects.<Projects>listAll()
+                .stream()
+                .map(ProjectsMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
+    // READ BY ID
+    public ProjectsResponseDTO getById(Long id) {
+        Projects entity = Projects.findById(id);
+        return ProjectsMapper.toDTO(entity);
+    }
+
+    // UPDATE
     @Transactional
-    public Projects update(Long id, Projects data) {
+    public ProjectsResponseDTO update(Long id, ProjectsRequestDTO dto) {
         Projects existing = Projects.findById(id);
         if (existing == null) return null;
 
-        existing.projName = data.projName;
-        existing.projDescription = data.projDescription;
-        existing.techStackIds = data.techStackIds;
-        existing.status = data.status;
-        existing.startDate = data.startDate;
-        existing.endDate = data.endDate;
+        ProjectsMapper.updateEntity(existing, dto);
+        existing.updatedAt = LocalDateTime.now();
 
-        return existing;
+        return ProjectsMapper.toDTO(existing);
     }
 
+    // DELETE
     @Transactional
     public boolean delete(Long id) {
         return Projects.deleteById(id);
     }
 
-    public List<Projects> search(
+    // SEARCH + FILTER + SORT + PAGINATION
+    public List<ProjectsResponseDTO> search(
             String name,
             String status,
-            String sort,
+            String sortField,
             String direction,
             int page,
             int size
     ) {
-        Sort sortOrder = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sort).descending()
-                : Sort.by(sort).ascending();
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortField).descending()
+                : Sort.by(sortField).ascending();
 
-        PanacheQuery<Projects> pq;
+        PanacheQuery<Projects> query;
 
         if (name != null && !name.isBlank() && status != null && !status.isBlank()) {
-            pq = Projects.find("projName LIKE ?1 AND status = ?2", sortOrder,
-                    "%" + name + "%", status);
+            query = Projects.find("projName LIKE ?1 AND status = ?2",
+                    sort, "%" + name + "%", status);
         }
         else if (name != null && !name.isBlank()) {
-            pq = Projects.find("projName LIKE ?1", sortOrder, "%" + name + "%");
+            query = Projects.find("projName LIKE ?1", sort, "%" + name + "%");
         }
         else if (status != null && !status.isBlank()) {
-            pq = Projects.find("status = ?1", sortOrder, status);
+            query = Projects.find("status = ?1", sort, status);
         }
         else {
-            pq = Projects.findAll(sortOrder);
+            query = Projects.findAll(sort);
         }
 
-        return pq.page(page, size).list();
+        return query.page(page, size)
+                .list()
+                .stream()
+                .map(ProjectsMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

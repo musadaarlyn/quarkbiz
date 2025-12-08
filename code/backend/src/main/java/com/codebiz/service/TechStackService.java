@@ -1,5 +1,7 @@
 package com.codebiz.service;
 
+import com.codebiz.dto.techstack.TechStackRequestDTO;
+import com.codebiz.mapper.techstack.TechStackMapper;
 import com.codebiz.model.TechStack;
 import com.codebiz.model.TechStackCategory;
 
@@ -14,18 +16,24 @@ public class TechStackService {
 
     // CREATE
     @Transactional
-    public TechStack create(TechStack ts) {
-        // Validate category
-        if (ts.category != null) {
-            TechStackCategory category = TechStackCategory.findById(ts.category);
-            if (category == null) {
-                throw new IllegalArgumentException("Category does not exist: " + ts.category);
-            }
+    public TechStack create(TechStackRequestDTO dto) {
+
+        TechStack entity = new TechStack();
+
+        // Validate & load category (IMPORTANT)
+        TechStackCategory category = TechStackCategory.findById(dto.categoryId);
+        if (category == null) {
+            throw new IllegalArgumentException("Category does not exist: " + dto.categoryId);
         }
 
-        ts.createdAt = LocalDateTime.now();
-        ts.persist();
-        return ts;
+        // Let mapper assign values
+        TechStackMapper.updateEntity(entity, dto, category);
+
+        entity.createdAt = LocalDateTime.now();
+        entity.updatedAt = LocalDateTime.now();
+
+        entity.persist();
+        return entity;
     }
 
     // READ ALL
@@ -58,22 +66,21 @@ public class TechStackService {
 
     // UPDATE
     @Transactional
-    public TechStack update(Long id, TechStack data) {
+    public TechStack update(Long id, TechStackRequestDTO dto) {
+
         TechStack existing = TechStack.findById(id);
         if (existing == null) {
             return null;
         }
 
-        // Validate category if changed
-        if (data.category != null) {
-            if (TechStackCategory.findById(data.category) == null) {
-                throw new IllegalArgumentException("Category does not exist: " + data.category);
-            }
+        // Validate category
+        TechStackCategory category = TechStackCategory.findById(dto.categoryId);
+        if (category == null) {
+            throw new IllegalArgumentException("Category does not exist: " + dto.categoryId);
         }
 
-        existing.tsName = data.tsName;
-        existing.tsDescription = data.tsDescription;
-        existing.category = data.category;
+        TechStackMapper.updateEntity(existing, dto, category);
+
         existing.updatedAt = LocalDateTime.now();
 
         return existing;
