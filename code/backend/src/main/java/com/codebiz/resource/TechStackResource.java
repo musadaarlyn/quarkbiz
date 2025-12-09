@@ -87,7 +87,7 @@ public class TechStackResource {
     ) {
         TechStack updated = service.update(id, dto);
         if (updated == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            throw new NotFoundException("Record not found");
         }
 
         TechStackResponseDTO response = TechStackMapper.toDTO(updated);
@@ -97,11 +97,12 @@ public class TechStackResource {
     // DELETE
     @DELETE
     @Path("/{id}")
+    @Transactional
     public Response delete(@PathParam("id") Long id) {
         boolean deleted = service.delete(id);
 
         if (!deleted) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            throw new NotFoundException("Record not found");
         }
 
         return Response.noContent().build();

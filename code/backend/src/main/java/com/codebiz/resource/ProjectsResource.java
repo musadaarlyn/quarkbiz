@@ -41,8 +41,9 @@ public class ProjectsResource {
     public Response getById(@PathParam("id") Long id) {
         ProjectsResponseDTO dto = service.getById(id);
         if (dto == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            throw new NotFoundException("Record not found");
         }
+
         return Response.ok(dto).build();
     }
 
@@ -68,7 +69,7 @@ public class ProjectsResource {
         ProjectsResponseDTO updated = service.update(id, dto);
 
         if (updated == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            throw new NotFoundException("Record not found");
         }
 
         return Response.ok(updated).build();
@@ -81,7 +82,7 @@ public class ProjectsResource {
         boolean deleted = service.delete(id);
 
         if (!deleted) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+           throw new NotFoundException("Record not found");
         }
 
         return Response.noContent().build();

@@ -1,6 +1,7 @@
 package com.codebiz.resource;
 
-import com.codebiz.model.TechStackCategory;
+import com.codebiz.dto.category.TechStackCategoryRequestDTO;
+import com.codebiz.dto.category.TechStackCategoryResponseDTO;
 import com.codebiz.service.TechStackCategoryService;
 
 import jakarta.inject.Inject;
@@ -23,14 +24,14 @@ public class TechStackCategoryResource {
     // CREATE
     @POST
     @Transactional
-    public Response create(@Valid TechStackCategory tsc) {
-        TechStackCategory created = service.create(tsc);
+    public Response create(@Valid TechStackCategoryRequestDTO dto) {
+        TechStackCategoryResponseDTO created = service.create(dto);
         return Response.status(Response.Status.CREATED).entity(created).build();
     }
 
     // READ ALL
     @GET
-    public List<TechStackCategory> listAll() {
+    public List<TechStackCategoryResponseDTO> listAll() {
         return service.listAll();
     }
 
@@ -38,16 +39,17 @@ public class TechStackCategoryResource {
     @GET
     @Path("/{id}")
     public Response findById(@PathParam("id") Long id) {
-        TechStackCategory cat = service.findById(id);
-        return cat == null
-                ? Response.status(Response.Status.NOT_FOUND).build()
-                : Response.ok(cat).build();
+        TechStackCategoryResponseDTO dto = service.findById(id);
+        if (dto == null) {
+            throw new NotFoundException("Category not found");
+        }
+        return Response.ok(dto).build();
     }
 
     // PAGINATION
     @GET
     @Path("/page")
-    public List<TechStackCategory> paginate(
+    public List<TechStackCategoryResponseDTO> paginate(
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("10") int size
     ) {
@@ -57,7 +59,7 @@ public class TechStackCategoryResource {
     // SEARCH + SORT
     @GET
     @Path("/search")
-    public List<TechStackCategory> search(
+    public List<TechStackCategoryResponseDTO> search(
             @QueryParam("name") String name,
             @QueryParam("sort") @DefaultValue("id") String sortField,
             @QueryParam("direction") @DefaultValue("asc") String direction,
@@ -71,20 +73,23 @@ public class TechStackCategoryResource {
     @PUT
     @Path("/{id}")
     @Transactional
-    public Response update(@PathParam("id") Long id, @Valid TechStackCategory tsc) {
-        TechStackCategory updated = service.update(id, tsc);
-        return updated == null
-                ? Response.status(Response.Status.NOT_FOUND).build()
-                : Response.ok(updated).build();
+    public Response update(@PathParam("id") Long id, @Valid TechStackCategoryRequestDTO dto) {
+        TechStackCategoryResponseDTO updated = service.update(id, dto);
+        if (updated == null) {
+            throw new NotFoundException("Category not found");
+        }
+        return Response.ok(updated).build();
     }
 
     // DELETE
     @DELETE
     @Path("/{id}")
+    @Transactional
     public Response delete(@PathParam("id") Long id) {
         boolean deleted = service.delete(id);
-        return deleted
-                ? Response.noContent().build()
-                : Response.status(Response.Status.NOT_FOUND).build();
+        if (!deleted) {
+            throw new NotFoundException("Category not found");
+        }
+        return Response.noContent().build();
     }
 }

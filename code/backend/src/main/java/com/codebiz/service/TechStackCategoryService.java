@@ -1,6 +1,13 @@
 package com.codebiz.service;
 
+import com.codebiz.dto.category.TechStackCategoryRequestDTO;
+import com.codebiz.dto.category.TechStackCategoryResponseDTO;
+import com.codebiz.mapper.category.TechStackCategoryMapper;
 import com.codebiz.model.TechStackCategory;
+
+import io.quarkus.panache.common.Sort;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -12,59 +19,80 @@ public class TechStackCategoryService {
 
     // CREATE
     @Transactional
-    public TechStackCategory create(TechStackCategory category) {
-        category.createdAt = LocalDateTime.now();
-        category.updatedAt = LocalDateTime.now();
-        category.persist();
-        return category;
+    public TechStackCategoryResponseDTO create(TechStackCategoryRequestDTO dto) {
+        TechStackCategory entity = TechStackCategoryMapper.toEntity(dto);
+        entity.createdAt = LocalDateTime.now();
+        entity.updatedAt = LocalDateTime.now();
+        entity.persist();
+        return TechStackCategoryMapper.toDTO(entity);
     }
 
     // READ ALL
-    public List<TechStackCategory> listAll() {
-        return TechStackCategory.listAll();
+    public List<TechStackCategoryResponseDTO> listAll() {
+        return TechStackCategory.<TechStackCategory>listAll()
+                .stream()
+                .map(TechStackCategoryMapper::toDTO)
+                .toList();
     }
 
+
     // READ BY ID
-    public TechStackCategory findById(Long id) {
-        return TechStackCategory.findById(id);
+    public TechStackCategoryResponseDTO findById(Long id) {
+        TechStackCategory entity = TechStackCategory.findById(id);
+        return TechStackCategoryMapper.toDTO(entity);
     }
 
     // PAGINATION
-    public List<TechStackCategory> paginate(int page, int size) {
-        return TechStackCategory.findAll()
-                .page(page, size)
-                .list();
+
+    public List<TechStackCategoryResponseDTO> paginate(int page, int size) {
+    return TechStackCategory.<TechStackCategory>findAll()
+            .page(page, size)
+            .list()
+            .stream()
+            .map(TechStackCategoryMapper::toDTO)
+            .toList();
     }
 
-    // SEARCH + SORT
-    public List<TechStackCategory> search(String name, String sortField, String direction, int page, int size) {
 
-        var sort = direction.equalsIgnoreCase("desc")
-                ? io.quarkus.panache.common.Sort.by(sortField).descending()
-                : io.quarkus.panache.common.Sort.by(sortField).ascending();
+    // SEARCH + SORT + PAGINATION
+    public List<TechStackCategoryResponseDTO> search(
+            String name,
+            String sortField,
+            String direction,
+            int page,
+            int size
+    ) {
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortField).descending()
+                : Sort.by(sortField).ascending();
 
-        if (name != null && !name.isEmpty()) {
-            return TechStackCategory.find("tscName LIKE ?1", sort, "%" + name + "%")
-                    .page(page, size)
-                    .list();
+        PanacheQuery<TechStackCategory> query;
+
+        if (name != null && !name.isBlank()) {
+            query = TechStackCategory.<TechStackCategory>find(
+        "tscName LIKE ?1", sort, "%" + name + "%"
+            );
+        } else {
+            query = TechStackCategory.<TechStackCategory>findAll(sort);
         }
 
-        return TechStackCategory.findAll(sort)
-                .page(page, size)
-                .list();
+        return query.page(page, size)
+                    .list()
+                    .stream()
+                    .map(TechStackCategoryMapper::toDTO)
+                    .toList();
     }
 
     // UPDATE
     @Transactional
-    public TechStackCategory update(Long id, TechStackCategory updated) {
+    public TechStackCategoryResponseDTO update(Long id, TechStackCategoryRequestDTO dto) {
         TechStackCategory existing = TechStackCategory.findById(id);
         if (existing == null) return null;
 
-        existing.tscName = updated.tscName;
-        existing.tscDescription = updated.tscDescription;
+        TechStackCategoryMapper.updateEntity(existing, dto);
         existing.updatedAt = LocalDateTime.now();
 
-        return existing;
+        return TechStackCategoryMapper.toDTO(existing);
     }
 
     // DELETE

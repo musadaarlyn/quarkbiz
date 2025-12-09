@@ -1,9 +1,25 @@
 package com.codebiz.mapper.category;
 
-import com.codebiz.dto.category.*;
+import com.codebiz.dto.category.TechStackCategoryRequestDTO;
+import com.codebiz.dto.category.TechStackCategoryResponseDTO;
 import com.codebiz.model.TechStackCategory;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class TechStackCategoryMapper {
+
+    public static TechStackCategory toEntity(TechStackCategoryRequestDTO dto) {
+        TechStackCategory entity = new TechStackCategory();
+        entity.tscName = dto.tscName;
+        entity.tscDescription = dto.tscDescription;
+        return entity;
+    }
+
+    public static void updateEntity(TechStackCategory entity, TechStackCategoryRequestDTO dto) {
+        entity.tscName = dto.tscName;
+        entity.tscDescription = dto.tscDescription;
+    }
 
     public static TechStackCategoryResponseDTO toDTO(TechStackCategory entity) {
         if (entity == null) return null;
@@ -18,9 +34,7 @@ public class TechStackCategoryMapper {
         return dto;
     }
 
-    public static void updateEntity(TechStackCategory entity, TechStackCategoryRequestDTO dto) {
-        entity.tscName = dto.tscName;
-        entity.tscDescription = dto.tscDescription;
+    public static List<TechStackCategoryResponseDTO> toDTOList(List<TechStackCategory> list) {
+        return list.stream().map(TechStackCategoryMapper::toDTO).collect(Collectors.toList());
     }
 }
-
