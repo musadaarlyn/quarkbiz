@@ -80,7 +80,7 @@ public class TechStackCategoryResource {
     @Path("/{id}")
     @Transactional
     public Response delete(@PathParam("id") Long id) {
-        boolean deleted = service.delete(id);
+        service.delete(id);
         return Response.noContent().build();
     }
 }
