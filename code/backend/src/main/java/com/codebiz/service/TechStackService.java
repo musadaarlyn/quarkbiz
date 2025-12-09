@@ -16,6 +16,11 @@ import java.util.List;
 @ApplicationScoped
 public class TechStackService {
 
+    // -------------------------------------
+    // CRUD
+    // -------------------------------------
+
+    // CREATE
     @Transactional
     public TechStack create(TechStackRequestDTO dto) {
 
@@ -30,6 +35,7 @@ public class TechStackService {
         return entity;
     }
 
+    // READ
     public List<TechStack> listAll() {
         return TechStack.listAll();
     }
@@ -56,6 +62,7 @@ public class TechStackService {
                 .list();
     }
 
+    // UPDATE
     @Transactional
     public TechStack update(Long id, TechStackRequestDTO dto) {
 
@@ -72,6 +79,7 @@ public class TechStackService {
         return existing;
     }
 
+    // DELETE
     @Transactional
     public void delete(Long id) {
         boolean deleted = TechStack.deleteById(id);
@@ -79,8 +87,11 @@ public class TechStackService {
             throw new NotFoundException("TechStack not found: " + id);
     }
 
-    // Validation Methods
+    // -------------------------------------
+    // VALIDATION HELPERS
+    // -------------------------------------
 
+    // ENSURE UNIQUE BEFORE CREATE
     private void ensureNameIsUnique(String name) {
         boolean exists = TechStack.find("LOWER(tsName) = LOWER(?1)", name)
                 .firstResult() != null;
@@ -89,6 +100,7 @@ public class TechStackService {
             throw new BadRequestException("TechStack name already exists");
     }
 
+    // ENSURE UNIQUE BEFORE UPDATE
     private void ensureNameIsUniqueForUpdate(Long id, String name) {
         TechStack found = TechStack.find("LOWER(tsName) = LOWER(?1)", name)
                 .firstResult();
@@ -97,6 +109,7 @@ public class TechStackService {
             throw new BadRequestException("TechStack name already exists");
     }
 
+    // REQUIRE CATEGORY
     private TechStackCategory requireCategory(Long id) {
         if (id == null)
             throw new BadRequestException("categoryId is required");

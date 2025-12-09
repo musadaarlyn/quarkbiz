@@ -20,7 +20,7 @@ import java.util.List;
 public class TechStackCategoryService {
 
     // -------------------------------------
-    // CRUD METHODS
+    // CRUD
     // -------------------------------------
 
     // CREATE
@@ -114,7 +114,7 @@ public class TechStackCategoryService {
     }
 
     // -------------------------------------
-    // UNIQUENESS VALIDATION METHODS
+    // VALIDATION HELPERS
     // -------------------------------------
 
     // ENSURE UNIQUE BEFORE CREATE
