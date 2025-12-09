@@ -7,6 +7,8 @@ import com.codebiz.model.TechStackCategory;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,21 +16,13 @@ import java.util.List;
 @ApplicationScoped
 public class TechStackService {
 
-    // CREATE
     @Transactional
     public TechStack create(TechStackRequestDTO dto) {
 
-        TechStack entity = new TechStack();
+        ensureNameIsUnique(dto.tsName);
+        TechStackCategory category = requireCategory(dto.categoryId);
 
-        // Validate & load category (IMPORTANT)
-        TechStackCategory category = TechStackCategory.findById(dto.categoryId);
-        if (category == null) {
-            throw new IllegalArgumentException("Category does not exist: " + dto.categoryId);
-        }
-
-        // Let mapper assign values
-        TechStackMapper.updateEntity(entity, dto, category);
-
+        TechStack entity = TechStackMapper.toEntity(dto, category);
         entity.createdAt = LocalDateTime.now();
         entity.updatedAt = LocalDateTime.now();
 
@@ -36,59 +30,81 @@ public class TechStackService {
         return entity;
     }
 
-    // READ ALL
     public List<TechStack> listAll() {
         return TechStack.listAll();
     }
 
-    // READ BY ID
     public TechStack getById(Long id) {
-        return TechStack.findById(id);
+        TechStack entity = TechStack.findById(id);
+        if (entity == null) throw new NotFoundException("TechStack not found: " + id);
+        return entity;
     }
 
-    // PAGINATION
     public List<TechStack> paginate(int page, int size) {
         return TechStack.findAll()
                 .page(page, size)
                 .list();
     }
 
-    // SEARCH
     public List<TechStack> search(String name, int page, int size) {
-        if (name == null || name.isEmpty()) {
+        if (name == null || name.isBlank()) {
             return paginate(page, size);
         }
 
-        return TechStack.find("tsName LIKE ?1", "%" + name + "%")
+        return TechStack.find("LOWER(tsName) LIKE LOWER(?1)", "%" + name + "%")
                 .page(page, size)
                 .list();
     }
 
-    // UPDATE
     @Transactional
     public TechStack update(Long id, TechStackRequestDTO dto) {
 
         TechStack existing = TechStack.findById(id);
-        if (existing == null) {
-            return null;
-        }
+        if (existing == null)
+            throw new NotFoundException("TechStack not found: " + id);
 
-        // Validate category
-        TechStackCategory category = TechStackCategory.findById(dto.categoryId);
-        if (category == null) {
-            throw new IllegalArgumentException("Category does not exist: " + dto.categoryId);
-        }
+        ensureNameIsUniqueForUpdate(id, dto.tsName);
+        TechStackCategory category = requireCategory(dto.categoryId);
 
         TechStackMapper.updateEntity(existing, dto, category);
-
         existing.updatedAt = LocalDateTime.now();
 
         return existing;
     }
 
-    // DELETE
     @Transactional
-    public boolean delete(Long id) {
-        return TechStack.deleteById(id);
+    public void delete(Long id) {
+        boolean deleted = TechStack.deleteById(id);
+        if (!deleted)
+            throw new NotFoundException("TechStack not found: " + id);
+    }
+
+    // Validation Methods
+
+    private void ensureNameIsUnique(String name) {
+        boolean exists = TechStack.find("LOWER(tsName) = LOWER(?1)", name)
+                .firstResult() != null;
+
+        if (exists)
+            throw new BadRequestException("TechStack name already exists");
+    }
+
+    private void ensureNameIsUniqueForUpdate(Long id, String name) {
+        TechStack found = TechStack.find("LOWER(tsName) = LOWER(?1)", name)
+                .firstResult();
+
+        if (found != null && !found.id.equals(id))
+            throw new BadRequestException("TechStack name already exists");
+    }
+
+    private TechStackCategory requireCategory(Long id) {
+        if (id == null)
+            throw new BadRequestException("categoryId is required");
+
+        TechStackCategory category = TechStackCategory.findById(id);
+        if (category == null)
+            throw new NotFoundException("Category does not exist: " + id);
+
+        return category;
     }
 }

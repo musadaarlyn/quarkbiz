@@ -14,7 +14,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("/techstack")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -29,8 +28,9 @@ public class TechStackResource {
     @Transactional
     public Response create(@Valid TechStackRequestDTO dto) {
         TechStack created = service.create(dto);
-        TechStackResponseDTO response = TechStackMapper.toDTO(created);
-        return Response.status(Response.Status.CREATED).entity(response).build();
+        return Response.status(Response.Status.CREATED)
+                .entity(TechStackMapper.toDTO(created))
+                .build();
     }
 
     // READ ALL
@@ -39,7 +39,7 @@ public class TechStackResource {
         return service.listAll()
                 .stream()
                 .map(TechStackMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // READ BY ID
@@ -60,7 +60,7 @@ public class TechStackResource {
         return service.paginate(page, size)
                 .stream()
                 .map(TechStackMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // SEARCH
@@ -74,7 +74,7 @@ public class TechStackResource {
         return service.search(name, page, size)
                 .stream()
                 .map(TechStackMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // UPDATE
@@ -82,16 +82,11 @@ public class TechStackResource {
     @Path("/{id}")
     @Transactional
     public Response update(
-            @PathParam("id") Long id, @Valid
-            TechStackRequestDTO dto
+            @PathParam("id") Long id,
+            @Valid TechStackRequestDTO dto
     ) {
         TechStack updated = service.update(id, dto);
-        if (updated == null) {
-            throw new NotFoundException("Record not found");
-        }
-
-        TechStackResponseDTO response = TechStackMapper.toDTO(updated);
-        return Response.ok(response).build();
+        return Response.ok(TechStackMapper.toDTO(updated)).build();
     }
 
     // DELETE
@@ -99,12 +94,7 @@ public class TechStackResource {
     @Path("/{id}")
     @Transactional
     public Response delete(@PathParam("id") Long id) {
-        boolean deleted = service.delete(id);
-
-        if (!deleted) {
-            throw new NotFoundException("Record not found");
-        }
-
+        service.delete(id);
         return Response.noContent().build();
     }
 }

@@ -40,10 +40,6 @@ public class ProjectsResource {
     @Path("/{id}")
     public Response getById(@PathParam("id") Long id) {
         ProjectsResponseDTO dto = service.getById(id);
-        if (dto == null) {
-            throw new NotFoundException("Record not found");
-        }
-
         return Response.ok(dto).build();
     }
 
@@ -67,24 +63,15 @@ public class ProjectsResource {
     @Transactional
     public Response update(@PathParam("id") Long id, @Valid ProjectsRequestDTO dto) {
         ProjectsResponseDTO updated = service.update(id, dto);
-
-        if (updated == null) {
-            throw new NotFoundException("Record not found");
-        }
-
         return Response.ok(updated).build();
     }
 
     // DELETE
     @DELETE
     @Path("/{id}")
+    @Transactional
     public Response delete(@PathParam("id") Long id) {
-        boolean deleted = service.delete(id);
-
-        if (!deleted) {
-           throw new NotFoundException("Record not found");
-        }
-
+        service.delete(id);
         return Response.noContent().build();
     }
 }

@@ -40,9 +40,6 @@ public class TechStackCategoryResource {
     @Path("/{id}")
     public Response findById(@PathParam("id") Long id) {
         TechStackCategoryResponseDTO dto = service.findById(id);
-        if (dto == null) {
-            throw new NotFoundException("Category not found");
-        }
         return Response.ok(dto).build();
     }
 
@@ -75,9 +72,6 @@ public class TechStackCategoryResource {
     @Transactional
     public Response update(@PathParam("id") Long id, @Valid TechStackCategoryRequestDTO dto) {
         TechStackCategoryResponseDTO updated = service.update(id, dto);
-        if (updated == null) {
-            throw new NotFoundException("Category not found");
-        }
         return Response.ok(updated).build();
     }
 
@@ -87,9 +81,6 @@ public class TechStackCategoryResource {
     @Transactional
     public Response delete(@PathParam("id") Long id) {
         boolean deleted = service.delete(id);
-        if (!deleted) {
-            throw new NotFoundException("Category not found");
-        }
         return Response.noContent().build();
     }
 }

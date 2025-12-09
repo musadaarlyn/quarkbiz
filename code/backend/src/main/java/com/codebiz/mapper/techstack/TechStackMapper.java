@@ -24,11 +24,21 @@ public class TechStackMapper {
         return dto;
     }
 
-    // DTO → ENTITY (service will pass the fetched category)
+    // DTO → Entity (FOR CREATE)
+    public static TechStack toEntity(TechStackRequestDTO dto, TechStackCategory category) {
+        TechStack entity = new TechStack();
+        entity.tsName = dto.tsName;
+        entity.tsDescription = dto.tsDescription;
+        entity.category = category;
+        return entity;
+    }
+
+    // DTO → ENTITY (FOR UPDATE) 
     public static void updateEntity(TechStack entity, TechStackRequestDTO dto, TechStackCategory category) {
 
         entity.tsName = dto.tsName;
         entity.tsDescription = dto.tsDescription;
         entity.category = category; // must be an object, not an ID
     }
+
 }

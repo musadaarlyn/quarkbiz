@@ -10,6 +10,8 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,9 +19,16 @@ import java.util.List;
 @ApplicationScoped
 public class TechStackCategoryService {
 
+    // -------------------------------------
+    // CRUD METHODS
+    // -------------------------------------
+
     // CREATE
     @Transactional
     public TechStackCategoryResponseDTO create(TechStackCategoryRequestDTO dto) {
+
+        ensureNameIsUnique(dto.tscName);
+
         TechStackCategory entity = TechStackCategoryMapper.toEntity(dto);
         entity.createdAt = LocalDateTime.now();
         entity.updatedAt = LocalDateTime.now();
@@ -39,11 +48,12 @@ public class TechStackCategoryService {
     // READ BY ID
     public TechStackCategoryResponseDTO findById(Long id) {
         TechStackCategory entity = TechStackCategory.findById(id);
+        if (entity == null) throw new NotFoundException("Category not found");
         return TechStackCategoryMapper.toDTO(entity);
     }
 
-    // PAGINATION
 
+    // PAGINATION
     public List<TechStackCategoryResponseDTO> paginate(int page, int size) {
     return TechStackCategory.<TechStackCategory>findAll()
             .page(page, size)
@@ -87,7 +97,9 @@ public class TechStackCategoryService {
     @Transactional
     public TechStackCategoryResponseDTO update(Long id, TechStackCategoryRequestDTO dto) {
         TechStackCategory existing = TechStackCategory.findById(id);
-        if (existing == null) return null;
+        if (existing == null) throw new NotFoundException("Category not found");
+
+        ensureNameIsUniqueForUpdate(id, dto.tscName);
 
         TechStackCategoryMapper.updateEntity(existing, dto);
         existing.updatedAt = LocalDateTime.now();
@@ -100,4 +112,27 @@ public class TechStackCategoryService {
     public boolean delete(Long id) {
         return TechStackCategory.deleteById(id);
     }
+
+    // -------------------------------------
+    // UNIQUENESS VALIDATION METHODS
+    // -------------------------------------
+
+    // ENSURE UNIQUE BEFORE CREATE
+    private void ensureNameIsUnique(String name) {
+        boolean exists = TechStackCategory.find("LOWER(tscName) = LOWER(?1)", name).firstResult() != null;
+        if (exists) {
+            throw new BadRequestException("Category name already exists");
+        }
+    }
+
+    // ENSURE UNIQUE BEFORE UPDATE
+    private void ensureNameIsUniqueForUpdate(Long id, String name) {
+        TechStackCategory existing = TechStackCategory.find("LOWER(tscName) = LOWER(?1)", name).firstResult();
+
+        if (existing != null && !existing.id.equals(id)) {
+            throw new BadRequestException("Category name already exists");
+        }
+    }
+
+
 }

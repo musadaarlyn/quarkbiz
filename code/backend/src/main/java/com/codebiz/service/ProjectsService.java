@@ -10,10 +10,10 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ProjectsService {
@@ -25,8 +25,8 @@ public class ProjectsService {
         Projects entity = ProjectsMapper.toEntity(dto);
         entity.createdAt = LocalDateTime.now();
         entity.updatedAt = LocalDateTime.now();
-
         entity.persist();
+
         return ProjectsMapper.toDTO(entity);
     }
 
@@ -35,12 +35,15 @@ public class ProjectsService {
         return Projects.<Projects>listAll()
                 .stream()
                 .map(ProjectsMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // READ BY ID
     public ProjectsResponseDTO getById(Long id) {
         Projects entity = Projects.findById(id);
+        if (entity == null) {
+            throw new NotFoundException("Project not found: " + id);
+        }
         return ProjectsMapper.toDTO(entity);
     }
 
@@ -48,7 +51,10 @@ public class ProjectsService {
     @Transactional
     public ProjectsResponseDTO update(Long id, ProjectsRequestDTO dto) {
         Projects existing = Projects.findById(id);
-        if (existing == null) return null;
+
+        if (existing == null) {
+            throw new NotFoundException("Project not found: " + id);
+        }
 
         ProjectsMapper.updateEntity(existing, dto);
         existing.updatedAt = LocalDateTime.now();
@@ -58,8 +64,12 @@ public class ProjectsService {
 
     // DELETE
     @Transactional
-    public boolean delete(Long id) {
-        return Projects.deleteById(id);
+    public void delete(Long id) {
+        boolean deleted = Projects.deleteById(id);
+
+        if (!deleted) {
+            throw new NotFoundException("Project not found: " + id);
+        }
     }
 
     // SEARCH + FILTER + SORT + PAGINATION
@@ -77,17 +87,32 @@ public class ProjectsService {
 
         PanacheQuery<Projects> query;
 
-        if (name != null && !name.isBlank() && status != null && !status.isBlank()) {
-            query = Projects.find("projName LIKE ?1 AND status = ?2",
-                    sort, "%" + name + "%", status);
-        }
-        else if (name != null && !name.isBlank()) {
-            query = Projects.find("projName LIKE ?1", sort, "%" + name + "%");
-        }
-        else if (status != null && !status.isBlank()) {
-            query = Projects.find("status = ?1", sort, status);
-        }
-        else {
+        boolean hasName = name != null && !name.isBlank();
+        boolean hasStatus = status != null && !status.isBlank();
+
+        if (hasName && hasStatus) {
+            query = Projects.find(
+                    "projName LIKE ?1 AND status = ?2",
+                    sort,
+                    "%" + name + "%",
+                    status
+            );
+
+        } else if (hasName) {
+            query = Projects.find(
+                    "projName LIKE ?1",
+                    sort,
+                    "%" + name + "%"
+            );
+
+        } else if (hasStatus) {
+            query = Projects.find(
+                    "status = ?1",
+                    sort,
+                    status
+            );
+
+        } else {
             query = Projects.findAll(sort);
         }
 
@@ -95,6 +120,6 @@ public class ProjectsService {
                 .list()
                 .stream()
                 .map(ProjectsMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
