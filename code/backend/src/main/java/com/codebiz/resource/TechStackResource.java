@@ -7,6 +7,8 @@ import com.codebiz.model.TechStack;
 import com.codebiz.service.TechStackService;
 
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -24,7 +26,8 @@ public class TechStackResource {
 
     // CREATE
     @POST
-    public Response create(TechStackRequestDTO dto) {
+    @Transactional
+    public Response create(@Valid TechStackRequestDTO dto) {
         TechStack created = service.create(dto);
         TechStackResponseDTO response = TechStackMapper.toDTO(created);
         return Response.status(Response.Status.CREATED).entity(response).build();
@@ -77,8 +80,9 @@ public class TechStackResource {
     // UPDATE
     @PUT
     @Path("/{id}")
+    @Transactional
     public Response update(
-            @PathParam("id") Long id,
+            @PathParam("id") Long id, @Valid
             TechStackRequestDTO dto
     ) {
         TechStack updated = service.update(id, dto);

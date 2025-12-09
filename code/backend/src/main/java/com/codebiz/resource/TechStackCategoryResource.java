@@ -4,6 +4,8 @@ import com.codebiz.model.TechStackCategory;
 import com.codebiz.service.TechStackCategoryService;
 
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -20,7 +22,8 @@ public class TechStackCategoryResource {
 
     // CREATE
     @POST
-    public Response create(TechStackCategory tsc) {
+    @Transactional
+    public Response create(@Valid TechStackCategory tsc) {
         TechStackCategory created = service.create(tsc);
         return Response.status(Response.Status.CREATED).entity(created).build();
     }
@@ -67,7 +70,8 @@ public class TechStackCategoryResource {
     // UPDATE
     @PUT
     @Path("/{id}")
-    public Response update(@PathParam("id") Long id, TechStackCategory tsc) {
+    @Transactional
+    public Response update(@PathParam("id") Long id, @Valid TechStackCategory tsc) {
         TechStackCategory updated = service.update(id, tsc);
         return updated == null
                 ? Response.status(Response.Status.NOT_FOUND).build()

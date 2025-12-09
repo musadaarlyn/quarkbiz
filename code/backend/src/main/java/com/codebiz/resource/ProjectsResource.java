@@ -6,6 +6,7 @@ import com.codebiz.service.ProjectsService;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -22,7 +23,8 @@ public class ProjectsResource {
 
     // CREATE
     @POST
-    public Response create(ProjectsRequestDTO dto) {
+    @Transactional
+    public Response create(@Valid ProjectsRequestDTO dto) {
         ProjectsResponseDTO created = service.create(dto);
         return Response.status(Response.Status.CREATED).entity(created).build();
     }
@@ -61,7 +63,8 @@ public class ProjectsResource {
     // UPDATE
     @PUT
     @Path("/{id}")
-    public Response update(@PathParam("id") Long id, ProjectsRequestDTO dto) {
+    @Transactional
+    public Response update(@PathParam("id") Long id, @Valid ProjectsRequestDTO dto) {
         ProjectsResponseDTO updated = service.update(id, dto);
 
         if (updated == null) {
