@@ -203,7 +203,7 @@ Currently it catches all exceptions as 500.
 I planned to fix this but I decided not to proceed (which is fine).
 REST semantics may be inaccurate for some errors.
 
-## ❌ 2. **Database password in your source code**
+## ❌ 2. **Database password in the source code**
 
 `application.properties` contains plain DB credentials.
 Needs migration to environment variables.
