@@ -1,18 +1,14 @@
+import { SectionWrapper } from "../layout/SectionWrapper";
+
 const DashboardSection = () => {
   return (
-    <section
-      id="dashboard"
-      className="w-full py-16 px-6 bg-white"
-    >
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
-        Dashboard Overview
-      </h2>
-
-      <p className="text-gray-600">
-        (Empty for now) — later this will show charts and summaries.
-      </p>
-    </section>
+    <SectionWrapper id="dashboard" title="Dashboard">
+      <div className="border rounded-xl p-6 bg-white shadow-sm">
+        <p className="text-gray-600">Dashboard metrics and charts will go here…</p>
+      </div>
+    </SectionWrapper>
   );
 };
+
 
 export default DashboardSection;

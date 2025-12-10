@@ -1,18 +1,14 @@
+import { SectionWrapper } from "../layout/SectionWrapper";
+
 const TechStackSection = () => {
   return (
-    <section
-      id="techstack"
-      className="w-full py-16 px-6 bg-white border-b border-gray-200"
-    >
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
-        Tech Stack
-      </h2>
-
-      <p className="text-gray-600">
-        (Coming soon) — CRUD interface for your technology stack items.
-      </p>
-    </section>
+    <SectionWrapper id="techstack" title="Tech Stack">
+      <div className="border rounded-xl p-6 bg-white shadow-sm">
+        <p className="text-gray-600">Tech Stack CRUD will go here…</p>
+      </div>
+    </SectionWrapper>
   );
 };
+
 
 export default TechStackSection;

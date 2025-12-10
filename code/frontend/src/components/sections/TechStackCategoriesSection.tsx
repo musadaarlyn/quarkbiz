@@ -1,17 +1,12 @@
+import { SectionWrapper } from "../layout/SectionWrapper";
+
 const TechStackCategoriesSection = () => {
   return (
-    <section
-      id="categories"
-      className="w-full py-16 px-6 bg-gray-50 border-b border-gray-200"
-    >
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
-        Tech Stack Categories
-      </h2>
-
-      <p className="text-gray-600">
-        (Coming soon) — Here you will manage tech stack categories with full CRUD.
-      </p>
-    </section>
+    <SectionWrapper id="categories" title="Categories" className="mt-20">
+      <div className="border rounded-xl p-6 bg-white shadow-sm">
+        <p className="text-gray-600">Categories CRUD will go here…</p>
+      </div>
+    </SectionWrapper>
   );
 };
 

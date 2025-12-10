@@ -1,4 +1,4 @@
-import Navbar from "../components/layout/Navbar";
+import Navbar from "../components/layout/Navbar"
 
 import TechStackCategoriesSection from "../components/sections/TechStackCategoriesSection";
 import TechStackSection from "../components/sections/TechStackSection";
@@ -10,8 +10,7 @@ const HomePage = () => {
     <>
       <Navbar />
 
-      {/* Add padding top so the fixed navbar doesn't overlap */}
-      <div className="pt-20">
+      <div>
         <TechStackCategoriesSection />
         <TechStackSection />
         <ProjectsSection />
