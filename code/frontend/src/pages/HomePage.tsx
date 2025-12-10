@@ -1,15 +1,32 @@
-import SectionCategories from "../components/categories/SectionCategories";
-import SectionTechStacks from "../components/techstack/SectionTechStacks";
-import SectionProjects from "../components/projects/SectionProjects";
-import SectionDashboard from "../components/dashboard/SectionDashboard";
+import TechStackCategoriesSection from "../components/sections/TechStackCategoriesSection";
+import TechStackSection from "../components/sections/TechStackSection";
+import ProjectsSection from "../components/sections/ProjectsSection";
+import DashboardSection from "../components/sections/DashboardSection";
 
 const HomePage = () => {
   return (
-    <div className="space-y-20 p-6">
-      <SectionCategories />
-      <SectionTechStacks />
-      <SectionProjects />
-      <SectionDashboard />
+    <div className="flex flex-col space-y-20 px-6 py-10">
+      
+      {/* 1. Tech Stack Categories */}
+      <section id="categories">
+        <TechStackCategoriesSection />
+      </section>
+
+      {/* 2. Tech Stack */}
+      <section id="techstack">
+        <TechStackSection />
+      </section>
+
+      {/* 3. Projects */}
+      <section id="projects">
+        <ProjectsSection />
+      </section>
+
+      {/* 4. Dashboard (empty for now) */}
+      <section id="dashboard">
+        <DashboardSection />
+      </section>
+
     </div>
   );
 };
