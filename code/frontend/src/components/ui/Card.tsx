@@ -2,11 +2,10 @@ import React from "react";
 
 interface CardProps {
   title: string;
-  description?: string;
   onClick?: () => void;
 }
 
-const Card: React.FC<CardProps> = ({ title, description, onClick }) => {
+const Card: React.FC<CardProps> = ({ title, onClick }) => {
   return (
     <div
       onClick={onClick}
@@ -18,9 +17,6 @@ const Card: React.FC<CardProps> = ({ title, description, onClick }) => {
     >
       <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
 
-      {description && (
-        <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
-      )}
     </div>
   );
 };

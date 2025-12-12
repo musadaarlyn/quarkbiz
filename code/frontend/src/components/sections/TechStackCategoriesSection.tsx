@@ -1,23 +1,120 @@
 import { SectionWrapper } from "../layout/SectionWrapper";
 import Card from "../ui/Card";
 import AddCard from "../ui/AddCard";
+import AddCategoryModal from "../modals/add/AddCategoryModal";
+import { useEffect, useState } from "react";
+import { fetchCategories, createCategory, updateCategory, deleteCategory } from "../../services/categories.service";
+import ViewCategoryModal from "../modals/view/ViewCategoryModal";
+import UpdateCategoryModal from "../modals/update/UpdateCategoryModal";
 
-const sampleCategories = [
-  { id: 1, name: "Frontend" },
-  { id: 2, name: "Backend" },
-  { id: 3, name: "DevOps" },
-];
+type Category = {
+  id: number;
+  tscName: string;
+  tscDescription?: string | null;
+};
 
 const TechStackCategoriesSection = () => {
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isLoading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [isViewOpen, setViewOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+  const [isUpdateOpen, setUpdateOpen] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        setCategories(await fetchCategories());
+        setError(null);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const handleAddCategory = async (name: string, description?: string) => {
+    try {
+      const created = await createCategory({ tscName: name, tscDescription: description });
+      setCategories((prev) => [...prev, created]);
+      setModalOpen(false);
+    } catch (err) {
+      alert((err as Error).message);
+    }
+  };
+
+  const handleUpdateCategory = async (id: number, name: string, description?: string) => {
+    const updated = await updateCategory(id, { tscName: name, tscDescription: description });
+    setCategories((prev) => prev.map((c) => (c.id === id ? updated : c)));
+    setUpdateOpen(false);
+    setViewOpen(false);
+  };
+
+  const handleDeleteCategory = async (cat: Category) => {
+    const confirmed = window.confirm(
+      `Delete “${cat.tscName}”? This cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    try {
+      await deleteCategory(cat.id);
+      setCategories((prev) => prev.filter((c) => c.id !== cat.id));
+      setViewOpen(false);
+    } catch (err) {
+      alert((err as Error).message);
+    }
+  };
+  
+  // RETURN -----------------------------------------
   return (
     <SectionWrapper id="categories" title="Categories" className="mt-20">
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {sampleCategories.map((cat) => (
-          <Card key={cat.id} title={cat.name} />
-        ))}
+      {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
+      {isLoading ? (
+        <p className="text-sm text-slate-500">Loading categories…</p>
+      ) : (
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {categories.map((cat) => (
+            <Card 
+            key={cat.id} 
+            title={cat.tscName} 
+            onClick={() => {
+              setSelectedCategory(cat);
+              setViewOpen(true);
+            }}
+            />
+          ))}
 
-        <AddCard onClick={() => console.log("Add Category clicked")} />
-      </div>
+          <AddCard onClick={() => setModalOpen(true)} />
+        </div>
+      )}
+
+      <AddCategoryModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleAddCategory}
+      />
+
+     <ViewCategoryModal
+        isOpen={isViewOpen}
+        category={selectedCategory}
+        onClose={() => setViewOpen(false)}
+        onEdit={(cat) => { setSelectedCategory(cat); setUpdateOpen(true); }}
+        onDelete={handleDeleteCategory}
+      />
+
+      <UpdateCategoryModal
+        isOpen={isUpdateOpen}
+        category={selectedCategory}
+        onClose={() => setUpdateOpen(false)}
+        onSubmit={handleUpdateCategory}
+      />
     </SectionWrapper>
   );
 };
