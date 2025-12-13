@@ -3,7 +3,7 @@ import Card from "../ui/Card";
 import AddCard from "../ui/AddCard";
 import AddCategoryModal from "../modals/add/AddCategoryModal";
 import { useEffect, useState } from "react";
-import { fetchCategories, createCategory, updateCategory, deleteCategory } from "../../services/categories.service";
+import { fetchCategories, createCategory, updateCategory, deleteCategory } from "../../services/CategoriesService";
 import ViewCategoryModal from "../modals/view/ViewCategoryModal";
 import UpdateCategoryModal from "../modals/update/UpdateCategoryModal";
 
@@ -51,10 +51,14 @@ const TechStackCategoriesSection = () => {
   };
 
   const handleUpdateCategory = async (id: number, name: string, description?: string) => {
-    const updated = await updateCategory(id, { tscName: name, tscDescription: description });
-    setCategories((prev) => prev.map((c) => (c.id === id ? updated : c)));
-    setUpdateOpen(false);
-    setViewOpen(false);
+    try{
+      const updated = await updateCategory(id, { tscName: name, tscDescription: description });
+      setCategories((prev) => prev.map((c) => (c.id === id ? updated : c)));
+      setUpdateOpen(false);
+      setViewOpen(false);
+    } catch (err) {
+      alert((err as Error).message);
+    }
   };
 
   const handleDeleteCategory = async (cat: Category) => {

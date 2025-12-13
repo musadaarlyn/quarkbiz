@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Modal from "../../ui/Modal";
-import { fetchCategories } from "../../../services/categories.service";
-
+import { fetchCategories } from "../../../services/CategoriesService";
 
 type Category = {
   id: number;
