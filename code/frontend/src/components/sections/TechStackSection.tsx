@@ -1,14 +1,9 @@
 import { SectionWrapper } from "../layout/SectionWrapper";
 import Card from "../ui/Card";
 import AddCard from "../ui/AddCard";
-import { fetchTechStacks } from "../../services/techstack.service";
+import { fetchTechStacks, createTechStack } from "../../services/techstack.service";
 import { useState, useEffect } from "react";
-
-const sampleStacks = [
-  { id: 1, name: "React" },
-  { id: 2, name: "Node.js" },
-  { id: 3, name: "Docker" },
-];
+import AddTechStackModal from "../modals/add/AddTechStackModal";
 
 type Stack = {
   id: number;
@@ -21,6 +16,7 @@ const TechStackSection = () => {
 
  const [stacks, setTechStacks] = useState<Stack[]>([]);
 
+  const [isModalOpen, setModalOpen] = useState(false);
  const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,6 +34,20 @@ const TechStackSection = () => {
      };
      load();
    }, []);
+
+   const handleAddStack = async (name: string, description?: string, category?: number) => {
+       try {
+        if (category === undefined) {
+          throw new Error("Category is required");
+        }
+
+         const created = await createTechStack({ tsName: name, tsDescription: description, categoryId:  category});
+         setTechStacks((prev) => [...prev, created]);
+         setModalOpen(false);
+       } catch (err) {
+         alert((err as Error).message);
+       }
+     };
 
   // RETURN -----------------------------------------
   return (
@@ -58,10 +68,15 @@ const TechStackSection = () => {
             />
           ))}
 
-          <AddCard  />
-          {/* onClick={() => setModalOpen(true)} */}
+          <AddCard   onClick={() => setModalOpen(true)}/>
         </div>
       )}
+
+      <AddTechStackModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleAddStack}
+      />
     </SectionWrapper>
   );
 };
