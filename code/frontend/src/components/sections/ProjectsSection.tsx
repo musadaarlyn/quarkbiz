@@ -1,13 +1,12 @@
 import { SectionWrapper } from "../layout/SectionWrapper";
 import Card from "../ui/Card";
 import AddCard from "../ui/AddCard";
+import { fetchProjects, createProject, updateProject, deleteProject } from "../../services/ProjectsService";
+import { fetchTechStacks } from "../../services/TechStackService";
 import { useState, useEffect } from "react";
 import AddProjectModal from "../modals/add/AddProjectModal";
-
-import { 
-  fetchProjects, 
-  createProject 
-} from "../../services/ProjectsService";
+import ViewProjectModal from "../modals/view/ViewProjectModal";
+import UpdateProjectModal from "../modals/update/UpdateProjectModal";
 
 type Project = {
   id: number;
@@ -24,28 +23,32 @@ type Project = {
 type TechStack = {
   id: number;
   tsName: string;
-  tsDescription?: string | null;
-  categoryId: number;
 };
 
 const ProjectsSection = () => {
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [techStacks, setTechStacks] = useState<TechStack[]>([]);
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [isViewOpen, setViewOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
   const [isUpdateOpen, setUpdateOpen] = useState(false);
 
   useEffect(() => {
-    const loadData = async () => {
+    const load = async () => {
       try {
         setLoading(true);
-        const [projectsData] = await Promise.all([
-          fetchProjects()
+        const [projectsData, stacksData] = await Promise.all([
+          fetchProjects(),
+          fetchTechStacks()
         ]);
         setProjects(projectsData);
+        setTechStacks(stacksData);
         setError(null);
       } catch (err) {
         setError((err as Error).message);
@@ -53,10 +56,11 @@ const ProjectsSection = () => {
         setLoading(false);
       }
     };
-    loadData();
+    load();
   }, []);
 
   const getTechStackNames = (ids: number[]): string[] => {
+    if (!ids || ids.length === 0) return [];
     return ids.map(id => {
       const stack = techStacks.find(ts => ts.id === id);
       return stack?.tsName || `Unknown (ID: ${id})`;
@@ -66,12 +70,19 @@ const ProjectsSection = () => {
   const handleAddProject = async (
     name: string, 
     description?: string, 
-    techStackIds: number[] = [], 
-    status: 'Planning' | 'In Progress' | 'Completed' | 'On Hold' = 'Planning',
+    techStackIds?: number[], 
+    status?: 'Planning' | 'In Progress' | 'Completed' | 'On Hold',
     startDate?: string,
     endDate?: string
   ) => {
     try {
+      if (!techStackIds || techStackIds.length === 0) {
+        throw new Error("At least one tech stack is required");
+      }
+      if (!status) {
+        throw new Error("Status is required");
+      }
+
       const created = await createProject({ 
         projName: name, 
         projDescription: description, 
@@ -80,20 +91,58 @@ const ProjectsSection = () => {
         startDate,
         endDate
       });
-      setProjects(prev => [...prev, created]);
+      setProjects((prev) => [...prev, created]);
       setModalOpen(false);
     } catch (err) {
       alert((err as Error).message);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Planning': return 'bg-blue-100 text-blue-800';
-      case 'In Progress': return 'bg-yellow-100 text-yellow-800';
-      case 'Completed': return 'bg-green-100 text-green-800';
-      case 'On Hold': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const handleUpdateProject = async (
+    id: number, 
+    name: string, 
+    description?: string, 
+    techStackIds?: number[], 
+    status?: 'Planning' | 'In Progress' | 'Completed' | 'On Hold',
+    startDate?: string,
+    endDate?: string
+  ) => {
+    try {
+      if (!techStackIds || techStackIds.length === 0) {
+        throw new Error("At least one tech stack is required");
+      }
+      if (!status) {
+        throw new Error("Status is required");
+      }
+
+      const updated = await updateProject(id, { 
+        projName: name, 
+        projDescription: description, 
+        techStackIds,
+        status,
+        startDate,
+        endDate
+      });
+      setProjects((prev) => prev.map((p) => (p.id === id ? updated : p)));
+      setUpdateOpen(false);
+      setViewOpen(false);
+    } catch (err) {
+      alert((err as Error).message);
+    }
+  };
+
+  const handleDeleteProject = async (project: Project) => {
+    const confirmed = window.confirm(
+      `Delete project "${project.projName}"? This cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    try {
+      await deleteProject(project.id);
+      setProjects((prev) => prev.filter((p) => p.id !== project.id));
+      setViewOpen(false);
+    } catch (err) {
+      alert((err as Error).message);
     }
   };
 
@@ -104,11 +153,11 @@ const ProjectsSection = () => {
       {isLoading ? (
         <p className="text-sm text-slate-500">Loading projects…</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex gap-4 overflow-x-auto pb-4">
           {projects.map((project) => (
             <Card 
               key={project.id} 
-              title={project.projName}
+              title={project.projName} 
               onClick={() => {
                 setSelectedProject(project);
                 setViewOpen(true);
@@ -126,6 +175,24 @@ const ProjectsSection = () => {
         onSubmit={handleAddProject}
       />
 
+      <ViewProjectModal
+        isOpen={isViewOpen}
+        project={selectedProject}
+        onClose={() => setViewOpen(false)}
+        onEdit={(project) => { 
+          setSelectedProject(project); 
+          setUpdateOpen(true); 
+        }}
+        onDelete={handleDeleteProject}
+        getTechStackNames={getTechStackNames}
+      />
+
+      <UpdateProjectModal
+        isOpen={isUpdateOpen}
+        project={selectedProject}
+        onClose={() => setUpdateOpen(false)}
+        onSubmit={handleUpdateProject}
+      />
     </SectionWrapper>
   );
 };

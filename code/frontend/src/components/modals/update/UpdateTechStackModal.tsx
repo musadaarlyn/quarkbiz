@@ -6,7 +6,7 @@ type Category = {
   id: number;
   tscName: string;
 };
-
+ 
 interface Props {
   isOpen: boolean;
   stack: { id: number; tsName: string; tsDescription?: string | null; categoryId?: number } | null;
@@ -56,7 +56,7 @@ const UpdateTechStackModal: React.FC<Props> = ({ isOpen, stack, onClose, onSubmi
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Edit category">
+    <Modal isOpen={isOpen} onClose={onClose} title="Edit Tech Stack">
       <div className="space-y-4">
         <input className="w-full border rounded-md px-3 py-2" value={name} onChange={(e) => setName(e.target.value)} />
         <textarea className="w-full border rounded-md px-3 py-2" value={description} onChange={(e) => setDescription(e.target.value)} />

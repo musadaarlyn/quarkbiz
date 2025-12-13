@@ -1,7 +1,8 @@
 import { SectionWrapper } from "../layout/SectionWrapper";
 import Card from "../ui/Card";
 import AddCard from "../ui/AddCard";
-import { fetchTechStacks, createTechStack, updateTechStack, deleteTechStack, fetchCategoryById } from "../../services/TechStackService";
+import { fetchTechStacks, createTechStack, updateTechStack, deleteTechStack } from "../../services/TechStackService";
+import { fetchCategoryById } from "../../services/CategoriesService";
 import { useState, useEffect } from "react";
 import AddTechStackModal from "../modals/add/AddTechStackModal";
 import ViewTechStackModal from "../modals/view/ViewTechStackModal";
