@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import AddTechStackModal from "../modals/crud/add/AddTechStackModal";
 import ViewTechStackModal from "../modals/crud/view/ViewTechStackModal";
 import UpdateTechStackModal from "../modals/crud/update/UpdateTechStackModal";
+import { getCategoryColor, getCategorySoftGradient } from "../../utils/ColorUtils";
 
 type RefreshActions = {
   categories: () => void;
@@ -135,17 +136,24 @@ const TechStackSection: React.FC<Props> = ({ categoryRefreshKey, requestRefresh 
         <p className="text-sm text-slate-500">Loading categories…</p>
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-4">
-          {stacks.map((stack) => (
-            <Card 
-            key={stack.id} 
-            title={stack.tsName} 
-            onClick={() => {
-              setSelectedStack(stack);
-              getCategoryName(stack.categoryId);
-              setViewOpen(true);
-            }}
-            />
-          ))}
+          {stacks.map((stack) => {
+            const solid = getCategoryColor(stack.categoryId);
+            const gradient = getCategorySoftGradient(stack.categoryId);
+            return (
+              <Card
+                key={stack.id}
+                title={stack.tsName}
+                onClick={() => {
+                  setSelectedStack(stack);
+                  getCategoryName(stack.categoryId);
+                  setViewOpen(true);
+                }}
+                style={{ background: gradient, borderColor: solid }}
+                className="shadow-md hover:shadow-lg"
+                titleClassName="text-slate-900"
+              />
+            );
+          })}
 
           <AddCard   onClick={() => setModalOpen(true)}/>
         </div>

@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import AddProjectModal from "../modals/crud/add/AddProjectModal";
 import ViewProjectModal from "../modals/crud/view/ViewProjectModal";
 import UpdateProjectModal from "../modals/crud/update/UpdateProjectModal";
+import { getProjectGradient } from "../../utils/ColorUtils";
 
 type RefreshActions = {
   categories: () => void;
@@ -175,13 +176,19 @@ const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) =
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-4">
           {projects.map((project) => (
-            <Card 
-              key={project.id} 
-              title={project.projName} 
+            <Card
+              key={project.id}
+              title={project.projName}
               onClick={() => {
                 setSelectedProject(project);
                 setViewOpen(true);
               }}
+              style={{
+                background: getProjectGradient(project.id),
+                borderColor: "transparent",
+              }}
+              className="shadow-md hover:shadow-lg backdrop-blur"
+              titleClassName="text-slate-900"
             />
           ))}
 

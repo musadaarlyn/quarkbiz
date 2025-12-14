@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { fetchCategories, createCategory, updateCategory, deleteCategory } from "../../services/CategoriesService";
 import ViewCategoryModal from "../modals/crud/view/ViewCategoryModal";
 import UpdateCategoryModal from "../modals/crud/update/UpdateCategoryModal";
+import { getCategoryColor } from "../../utils/ColorUtils";
 
 type Category = {
   id: number;
@@ -105,16 +106,22 @@ const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
         <p className="text-sm text-slate-500">Loading categories…</p>
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-4">
-          {categories.map((cat) => (
-            <Card 
-            key={cat.id} 
-            title={cat.tscName} 
-            onClick={() => {
-              setSelectedCategory(cat);
-              setViewOpen(true);
-            }}
-            />
-          ))}
+          {categories.map((cat) => {
+            const color = getCategoryColor(cat.id);
+            return (
+              <Card
+                key={cat.id}
+                title={cat.tscName}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  setViewOpen(true);
+                }}
+                style={{ background: color, borderColor: color }}
+                className="shadow-lg hover:shadow-xl"
+                titleClassName="text-white"
+              />
+            );
+          })}
 
           <AddCard onClick={() => setModalOpen(true)} />
         </div>
