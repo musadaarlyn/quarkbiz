@@ -122,6 +122,7 @@ const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
             const color = getCategoryColor(cat.id);
             return (
               <Card
+                id={`category-card-${cat.id}`}
                 key={cat.id}
                 title={cat.tscName}
                 onClick={() => {

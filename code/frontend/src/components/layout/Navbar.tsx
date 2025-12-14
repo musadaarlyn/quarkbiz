@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import logo from "../../assets/img/quarkbiz-logo.png";
+import SearchBar from "./SearchBar";
 
 const NAV_ITEMS = [
   { label: "Categories", id: "categories" },
@@ -39,7 +40,7 @@ export default function Navbar() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(37,150,190,0.35),_rgba(7,18,33,0.95))]" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#071221] via-[#0d1f33] to-[#0b1a29]/90 border-b border-white/10" />
 
-      <div className="relative max-w-7xl mx-auto px-6 flex items-center justify-between w-full">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between w-full">
         <div className="flex items-center gap-3">
           <img
             src={logo}
@@ -50,6 +51,10 @@ export default function Navbar() {
             <h1 className="text-xl font-semibold text-white tracking-wide">QuarkBiz</h1>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Engineered Workflows</p>
           </div>
+        </div>
+
+        <div className="hidden md:flex flex-1 max-w-md mx-8">
+          <SearchBar />
         </div>
 
       {/* for desktop */}
@@ -96,6 +101,9 @@ export default function Navbar() {
 
       {menuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-[#071221]/95 backdrop-blur border-t border-white/10">
+          <div className="px-6 pt-4 pb-2">
+            <SearchBar />
+          </div>
           <ul className="flex flex-col px-6 py-4 space-y-3 text-white/80">
             {NAV_ITEMS.map((item) => (
               <li key={item.id}>

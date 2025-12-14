@@ -151,6 +151,7 @@ const TechStackSection: React.FC<Props> = ({ categoryRefreshKey, requestRefresh 
             const gradient = getCategorySoftGradient(stack.categoryId);
             return (
               <Card
+                id={`techstack-card-${stack.id}`}
                 key={stack.id}
                 title={stack.tsName}
                 onClick={() => {

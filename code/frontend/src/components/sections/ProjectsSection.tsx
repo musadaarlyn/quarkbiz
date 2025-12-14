@@ -189,6 +189,7 @@ const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) =
           {projects.map((project) => (
             <Card
               key={project.id}
+              id={`project-card-${project.id}`}
               title={project.projName}
               onClick={() => {
                 setSelectedProject(project);

@@ -6,6 +6,7 @@ interface CardProps {
   className?: string;
   titleClassName?: string;
   style?: React.CSSProperties;
+  id?: string; 
 }
 
 const Card: React.FC<CardProps> = ({ 
@@ -13,9 +14,11 @@ const Card: React.FC<CardProps> = ({
   onClick, 
   className = "",
   titleClassName = "",
-  style }) => {
+  style,
+  id }) => {
   return (
     <div
+      id={id}
       onClick={onClick}
       style={style}
       className={`w-48 h-32 rounded-xl border border-gray-200 
