@@ -17,6 +17,10 @@ import { SectionWrapper } from "../layout/SectionWrapper";
 
 type LoadState = "idle" | "loading" | "error" | "ready";
 
+interface Props {
+  refreshKey?: number;
+}
+
 const statusPalette: Record<string, string> = {
   PLANNING: "#38bdf8",
   IN_PROGRESS: "#a855f7",
@@ -32,7 +36,7 @@ const formatStatus = (value: string) =>
     .map((w) => w[0].toUpperCase() + w.slice(1))
     .join(" ");
 
-const DashboardSection = () => {
+const DashboardSection = ({ refreshKey }: Props = {}) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [state, setState] = useState<LoadState>("idle");
 
@@ -56,6 +60,21 @@ const DashboardSection = () => {
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+      if (refreshKey !== undefined) {
+        setState("loading");
+        fetchDashboardStats()
+          .then((payload) => {
+            setStats(payload);
+            setState("ready");
+          })
+          .catch((err) => {
+            console.error(err);
+            setState("error");
+          });
+      }
+    }, [refreshKey]);
 
   const summary = useMemo(() => {
     if (!stats) {

@@ -11,6 +11,7 @@ const HomePage = () => {
   const [categoriesVersion, setCategoriesVersion] = useState(0);
   const [stacksVersion, setStacksVersion] = useState(0);
   const [projectsVersion, setProjectsVersion] = useState(0);
+  const [dashboardVersion, setDashboardVersion] = useState(0);
 
   const triggerCategoriesRefresh = useCallback(
     () => setCategoriesVersion((v) => v + 1),
@@ -25,13 +26,19 @@ const HomePage = () => {
     []
   );
 
+  const triggerDashboardRefresh = useCallback(
+    () => setDashboardVersion((v) => v + 1),
+    []
+  );
+
   const refreshFunctions = useMemo(
     () => ({
       categories: triggerCategoriesRefresh,
       stacks: triggerStacksRefresh,
       projects: triggerProjectsRefresh,
+      dashboard: triggerDashboardRefresh,
     }),
-    [triggerCategoriesRefresh, triggerStacksRefresh, triggerProjectsRefresh]
+    [triggerCategoriesRefresh, triggerStacksRefresh, triggerProjectsRefresh, triggerDashboardRefresh]
   );
 
   return (
@@ -51,7 +58,7 @@ const HomePage = () => {
           stackRefreshKey={stacksVersion}
           requestRefresh={refreshFunctions}
         />
-        <DashboardSection />
+        <DashboardSection refreshKey={dashboardVersion} />
       </div>
     </>
   );

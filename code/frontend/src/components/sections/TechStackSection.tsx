@@ -14,6 +14,7 @@ type RefreshActions = {
   categories: () => void;
   stacks: () => void;
   projects: () => void;
+  dashboard: () => void;
 };
 
 interface Props {
@@ -70,6 +71,7 @@ const TechStackSection: React.FC<Props> = ({ categoryRefreshKey, requestRefresh 
     requestRefresh.categories();
     requestRefresh.stacks();
     requestRefresh.projects();
+    requestRefresh.dashboard(); 
    };
 
    const getCategoryName = async (category?: number)  => {

@@ -14,6 +14,7 @@ type RefreshActions = {
   categories: () => void;
   stacks: () => void;
   projects: () => void;
+  dashboard: () => void;
 };
 
 interface Props {
@@ -78,6 +79,7 @@ const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) =
     requestRefresh.categories();
     requestRefresh.stacks();
     requestRefresh.projects();
+    requestRefresh.dashboard(); 
   };
 
   const getTechStackNames = (ids: number[]): string[] => {
