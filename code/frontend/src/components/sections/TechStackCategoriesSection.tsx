@@ -1,11 +1,11 @@
 import { SectionWrapper } from "../layout/SectionWrapper";
 import Card from "../ui/Card";
 import AddCard from "../ui/AddCard";
-import AddCategoryModal from "../modals/add/AddCategoryModal";
+import AddCategoryModal from "../modals/crud/add/AddCategoryModal";
 import { useEffect, useState } from "react";
 import { fetchCategories, createCategory, updateCategory, deleteCategory } from "../../services/CategoriesService";
-import ViewCategoryModal from "../modals/view/ViewCategoryModal";
-import UpdateCategoryModal from "../modals/update/UpdateCategoryModal";
+import ViewCategoryModal from "../modals/crud/view/ViewCategoryModal";
+import UpdateCategoryModal from "../modals/crud/update/UpdateCategoryModal";
 
 type Category = {
   id: number;

@@ -4,9 +4,9 @@ import AddCard from "../ui/AddCard";
 import { fetchProjects, createProject, updateProject, deleteProject } from "../../services/ProjectsService";
 import { fetchTechStacks } from "../../services/TechStackService";
 import { useState, useEffect } from "react";
-import AddProjectModal from "../modals/add/AddProjectModal";
-import ViewProjectModal from "../modals/view/ViewProjectModal";
-import UpdateProjectModal from "../modals/update/UpdateProjectModal";
+import AddProjectModal from "../modals/crud/add/AddProjectModal";
+import ViewProjectModal from "../modals/crud/view/ViewProjectModal";
+import UpdateProjectModal from "../modals/crud/update/UpdateProjectModal";
 
 type RefreshActions = {
   categories: () => void;

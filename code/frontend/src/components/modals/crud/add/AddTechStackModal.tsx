@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import Modal from "../../ui/Modal";
-import { fetchCategories } from "../../../services/CategoriesService";
+import Modal from "../../../ui/Modal";
+import { fetchCategories } from "../../../../services/CategoriesService";
 
 type Category = {
   id: number;
@@ -15,6 +15,11 @@ interface Props {
 }
 
 const AddTechStackModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, categoryRefreshKey }) => {
+
+  const [errors, setErrors] = useState<{
+    name?: string;
+    categoryId?: string;
+  }>({});
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setLoading] = useState(true);
@@ -40,8 +45,24 @@ const AddTechStackModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, categor
     }, [isOpen, categoryRefreshKey]);
 
   const handleSubmit = () => {
-    if (!name.trim()) return;
-    if(!description.trim()) return;
+    const newErrors: {
+      name?: string;
+      categoryId?: string;
+    } = {};
+
+    if (!name.trim()) {
+      newErrors.name = "Tech stack name is required";
+    }
+
+    if (categoryId === 0) {
+      newErrors.categoryId = "Please select a category";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+  
     onSubmit(name, description, categoryId);
     setName("");
     setDescription("");
@@ -56,10 +77,22 @@ const AddTechStackModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, categor
         <input
           type="text"
           placeholder="Tech Stack Name"
-          className="w-full border rounded-md px-3 py-2"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (errors.name) {
+              setErrors(prev => ({ ...prev, name: undefined }));
+            }
+          }}
+          className={`w-full px-3 py-2 rounded-md border ${
+            errors.name ? "border-red-500" : "border-slate-300"
+          }`}
         />
+
+        {errors.name && (
+          <p className="text-sm text-red-500 mt-1">{errors.name}</p>
+        )}
+
 
         <textarea
           placeholder="Description"
@@ -68,22 +101,40 @@ const AddTechStackModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, categor
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
-            {isLoading ? (
-                <p className="text-sm text-slate-500">Loading categories…</p>
-            ) : (
-        <select
-            className="w-full border rounded-md px-3 py-2"
-            value={categoryId}
-            onChange={(e) => setCategoryId(Number(e.target.value))}
+        {error && (
+          <p className="text-sm text-red-500 mb-2">{error}</p>
+        )}
+
+        {isLoading ? (
+          <p className="text-sm text-slate-500">Loading categories…</p>
+        ) : (
+          <>
+            <select
+              value={categoryId}
+              onChange={(e) => {
+                setCategoryId(Number(e.target.value));
+                if (errors.categoryId) {
+                  setErrors(prev => ({ ...prev, categoryId: undefined }));
+                }
+              }}
+              className={`w-full px-3 py-2 rounded-md border ${
+                errors.categoryId ? "border-red-500" : "border-slate-300"
+              }`}
             >
-            <option value="">Select category</option>
-            {categories.map((cat) => (
+              <option value={0}>Select category</option>
+              {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>
-                {cat.tscName}
+                  {cat.tscName}
                 </option>
-            ))}
-        </select>
+              ))}
+            </select>
+
+            {errors.categoryId && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.categoryId}
+              </p>
+            )}
+          </>
         )}
 
         <button

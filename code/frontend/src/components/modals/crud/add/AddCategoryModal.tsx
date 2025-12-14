@@ -1,5 +1,5 @@
 import { use, useState } from "react";
-import Modal from "../../ui/Modal";
+import Modal from "../../../ui/Modal";
 
 interface Props {
   isOpen: boolean;
@@ -11,9 +11,23 @@ const AddCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
+  const [errors, setErrors] = useState<{
+    name?: string;
+  }>({});
+
+
   const handleSubmit = () => {
-    if (!name.trim()) return;
-    if(!description.trim()) return;
+    const newErrors: { name?: string } = {};
+
+    if (!name.trim()) {
+      newErrors.name = "Category name is required";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     onSubmit(name, description);
     setName("");
     setDescription("");
@@ -26,10 +40,22 @@ const AddCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
         <input
           type="text"
           placeholder="Category Name"
-          className="w-full border rounded-md px-3 py-2"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (errors.name) {
+              setErrors((prev) => ({ ...prev, name: undefined }));
+            }
+          }}
+          className={`w-full rounded-md px-3 py-2 border ${
+            errors.name ? "border-red-500" : "border-slate-300"
+          }`}
         />
+
+        {errors.name && (
+          <p className="text-sm text-red-500">{errors.name}</p>
+        )}
+
 
         <textarea
           placeholder="Description"
@@ -45,6 +71,7 @@ const AddCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
           Add Category
         </button>
       </div>
+
     </Modal>
   );
 };

@@ -4,9 +4,9 @@ import AddCard from "../ui/AddCard";
 import { fetchTechStacks, createTechStack, updateTechStack, deleteTechStack } from "../../services/TechStackService";
 import { fetchCategoryById } from "../../services/CategoriesService";
 import { useState, useEffect } from "react";
-import AddTechStackModal from "../modals/add/AddTechStackModal";
-import ViewTechStackModal from "../modals/view/ViewTechStackModal";
-import UpdateTechStackModal from "../modals/update/UpdateTechStackModal";
+import AddTechStackModal from "../modals/crud/add/AddTechStackModal";
+import ViewTechStackModal from "../modals/crud/view/ViewTechStackModal";
+import UpdateTechStackModal from "../modals/crud/update/UpdateTechStackModal";
 
 type RefreshActions = {
   categories: () => void;
