@@ -2,6 +2,7 @@ package com.codebiz.service;
 
 import com.codebiz.dto.techstack.TechStackRequestDTO;
 import com.codebiz.mapper.techstack.TechStackMapper;
+import com.codebiz.model.Projects;
 import com.codebiz.model.TechStack;
 import com.codebiz.model.TechStackCategory;
 
@@ -9,12 +10,17 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @ApplicationScoped
 public class TechStackService {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // -------------------------------------
     // CRUD
@@ -82,9 +88,13 @@ public class TechStackService {
     // DELETE
     @Transactional
     public void delete(Long id) {
-        boolean deleted = TechStack.deleteById(id);
-        if (!deleted)
+        TechStack existing = TechStack.findById(id);
+        if (existing == null)
             throw new NotFoundException("TechStack not found: " + id);
+
+        ensureNotUsedByProjects(id);
+
+        existing.delete();
     }
 
     // -------------------------------------
@@ -119,5 +129,24 @@ public class TechStackService {
             throw new NotFoundException("Category does not exist: " + id);
 
         return category;
+    }
+
+    // ENSURE NO PROJECTS BEFORE DELETE
+    private void ensureNotUsedByProjects(Long techStackId) {
+        for (Projects project : Projects.<Projects>listAll()) {
+            if (readTechStackIds(project.techStackIds).contains(techStackId)) {
+                throw new BadRequestException(
+                    "Cannot delete tech stack while it is used by project: " + project.projName);
+            }
+        }
+    }
+
+    private List<Long> readTechStackIds(String json) {
+        try {
+            if (json == null || json.isBlank()) return List.of();
+            return objectMapper.readValue(json, new TypeReference<List<Long>>() {});
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 }

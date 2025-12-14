@@ -3,6 +3,7 @@ package com.codebiz.service;
 import com.codebiz.dto.category.TechStackCategoryRequestDTO;
 import com.codebiz.dto.category.TechStackCategoryResponseDTO;
 import com.codebiz.mapper.category.TechStackCategoryMapper;
+import com.codebiz.model.TechStack;
 import com.codebiz.model.TechStackCategory;
 
 import io.quarkus.panache.common.Sort;
@@ -110,7 +111,13 @@ public class TechStackCategoryService {
     // DELETE
     @Transactional
     public boolean delete(Long id) {
-        return TechStackCategory.deleteById(id);
+        TechStackCategory existing = TechStackCategory.findById(id);
+        if (existing == null) throw new NotFoundException("Category not found");
+
+        ensureNoTechStacks(id);
+
+        existing.delete();
+        return true;
     }
 
     // -------------------------------------
@@ -134,5 +141,13 @@ public class TechStackCategoryService {
         }
     }
 
+    // ENSURE NO TECH STACK BEFORE DELETE
+    private void ensureNoTechStacks(Long categoryId) {
+        long stackCount = TechStack.count("category.id = ?1", categoryId);
+        if (stackCount > 0) {
+            throw new BadRequestException(
+                "Cannot delete category while " + stackCount + " tech stack(s) still reference it");
+        }
+    }
 
 }
