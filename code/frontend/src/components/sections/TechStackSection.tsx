@@ -130,12 +130,12 @@ const TechStackSection: React.FC<Props> = ({ categoryRefreshKey, requestRefresh 
 
   // RETURN -----------------------------------------
   return (
-    <SectionWrapper id="techstack" title="Tech Stack">
+    <SectionWrapper id="techstack" title="Tech Stack" className="bg-[#FAFAFB]">
       {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
       {isLoading ? (
         <p className="text-sm text-slate-500">Loading categories…</p>
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex flex-wrap gap-4">
           {stacks.map((stack) => {
             const solid = getCategoryColor(stack.categoryId);
             const gradient = getCategorySoftGradient(stack.categoryId);

@@ -169,12 +169,12 @@ const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) =
 
   // RETURN -----------------------------------------
   return (
-    <SectionWrapper id="projects" title="Projects">
+    <SectionWrapper id="projects" title="Projects" className="bg-[#FAFAFB]">
       {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
       {isLoading ? (
         <p className="text-sm text-slate-500">Loading projects…</p>
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex flex-wrap gap-4">
           {projects.map((project) => (
             <Card
               key={project.id}

@@ -100,12 +100,12 @@ const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
   
   // RETURN -----------------------------------------
   return (
-    <SectionWrapper id="categories" title="Categories" className="mt-20">
+    <SectionWrapper id="categories" title="Categories" className="mt-20 bg-[#FAFAFB]">
       {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
       {isLoading ? (
         <p className="text-sm text-slate-500">Loading categories…</p>
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex flex-wrap gap-4">
           {categories.map((cat) => {
             const color = getCategoryColor(cat.id);
             return (

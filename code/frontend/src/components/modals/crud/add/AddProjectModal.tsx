@@ -239,7 +239,7 @@ const AddProjectModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, stackRefr
                 type="date"
                 value={endDate}
                 onChange={(e) => {
-                    setStartDate(e.target.value);
+                    setEndDate(e.target.value);
                     if (errors.endDate) {
                     setErrors(prev => ({ ...prev, endDate: undefined }));
                     }
