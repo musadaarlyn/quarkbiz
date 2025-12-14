@@ -44,12 +44,10 @@ const HomePage = () => {
           requestRefresh={refreshFunctions}
         />
         <TechStackSection
-          refreshKey={stacksVersion}
           categoryRefreshKey={categoriesVersion}
           requestRefresh={refreshFunctions}
         />
         <ProjectsSection
-          refreshKey={projectsVersion}
           stackRefreshKey={stacksVersion}
           requestRefresh={refreshFunctions}
         />

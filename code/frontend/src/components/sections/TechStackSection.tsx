@@ -15,7 +15,6 @@ type RefreshActions = {
 };
 
 interface Props {
-  refreshKey: number;
   requestRefresh: RefreshActions;
   categoryRefreshKey: number;
 }
@@ -33,7 +32,7 @@ type Category = {
   tscName: string;
 };
 
-const TechStackSection: React.FC<Props> = ({ refreshKey, categoryRefreshKey, requestRefresh }) => {
+const TechStackSection: React.FC<Props> = ({ categoryRefreshKey, requestRefresh }) => {
 
  const [stacks, setTechStacks] = useState<Stack[]>([]);
 
@@ -62,7 +61,7 @@ const TechStackSection: React.FC<Props> = ({ refreshKey, categoryRefreshKey, req
        }
      };
      load();
-   }, [refreshKey]);
+   }, []);
 
    const triggerAllSections = () => {
     requestRefresh.categories();

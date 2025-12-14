@@ -24,7 +24,7 @@ interface Props {
   requestRefresh: RefreshActions;
 }
 
-const TechStackCategoriesSection: React.FC<Props> = ({ refreshKey, requestRefresh }) => {
+const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
 
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -50,7 +50,7 @@ const TechStackCategoriesSection: React.FC<Props> = ({ refreshKey, requestRefres
       }
     };
     load();
-  }, [refreshKey]);
+  }, []);
 
   const triggerAllSections = () => {
     requestRefresh.categories();

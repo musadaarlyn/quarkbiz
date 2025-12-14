@@ -15,7 +15,6 @@ type RefreshActions = {
 };
 
 interface Props {
-  refreshKey: number;
   requestRefresh: RefreshActions;
   stackRefreshKey: number;
 }
@@ -37,7 +36,7 @@ type TechStack = {
   tsName: string;
 };
 
-const ProjectsSection: React.FC<Props> = ({ refreshKey, requestRefresh, stackRefreshKey }) => {
+const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) => {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [techStacks, setTechStacks] = useState<TechStack[]>([]);
@@ -69,7 +68,7 @@ const ProjectsSection: React.FC<Props> = ({ refreshKey, requestRefresh, stackRef
       }
     };
     load();
-  }, [refreshKey]);
+  }, []);
 
   const triggerAllSections = () => {
     requestRefresh.categories();
