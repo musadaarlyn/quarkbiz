@@ -8,6 +8,7 @@ import AddProjectModal from "../modals/crud/add/AddProjectModal";
 import ViewProjectModal from "../modals/crud/view/ViewProjectModal";
 import UpdateProjectModal from "../modals/crud/update/UpdateProjectModal";
 import { getProjectGradient } from "../../utils/ColorUtils";
+import { useAlert } from "../../contexts/AlertContext";
 
 type RefreshActions = {
   categories: () => void;
@@ -50,6 +51,8 @@ const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) =
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const [isUpdateOpen, setUpdateOpen] = useState(false);
+
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     const load = async () => {
@@ -113,7 +116,11 @@ const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) =
       setModalOpen(false);
       triggerAllSections();
     } catch (err) {
-      alert((err as Error).message);
+      showAlert({
+        title: "Cannot create project",
+        message: (err as Error).message,
+        intent: "error",
+      });
     }
   };
 
@@ -147,15 +154,15 @@ const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) =
       setViewOpen(false);
       triggerAllSections();
     } catch (err) {
-      alert((err as Error).message);
+      showAlert({
+        title: "Cannot update project",
+        message: (err as Error).message,
+        intent: "error",
+      });
     }
   };
 
   const handleDeleteProject = async (project: Project) => {
-    const confirmed = window.confirm(
-      `Delete project "${project.projName}"? This cannot be undone.`
-    );
-    if (!confirmed) return;
 
     try {
       await deleteProject(project.id);
@@ -163,7 +170,11 @@ const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) =
       setViewOpen(false);
       triggerAllSections();
     } catch (err) {
-      alert((err as Error).message);
+      showAlert({
+        title: "Cannot delete project",
+        message: (err as Error).message,
+        intent: "warning",
+      });
     }
   };
 

@@ -1,9 +1,17 @@
 const base = 'http://localhost:8080/categories';
 
+// HANDLE RESPONSE
+async function handleResponse(res: Response) {
+  if (res.ok) return res;
+  const data = await res.json().catch(() => ({}));
+  const message = data?.message ?? "Something went wrong";
+  throw new Error(message);
+}
+
 // FETCH CATEGORIES
 export async function fetchCategories() {
   const res = await fetch(`${base}`);
-  if (!res.ok) throw new Error('Failed to load categories');
+  await handleResponse(res);
   return res.json();
 }
 
@@ -20,7 +28,7 @@ export async function createCategory(payload: { tscName: string; tscDescription?
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error('Failed to create category');
+  await handleResponse(res);
   return res.json();
 }
 
@@ -31,7 +39,7 @@ export async function updateCategory(id: number, payload: { tscName: string; tsc
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error('Failed to update category');
+  await handleResponse(res);
   return res.json();
 }
 
@@ -40,5 +48,5 @@ export async function deleteCategory(id: number) {
   const res = await fetch(`${base}/${id}`, { 
     method: 'DELETE' 
   });
-  if (!res.ok) throw new Error('Failed to delete category');
+  await handleResponse(res);
 }

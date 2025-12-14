@@ -7,6 +7,7 @@ import { fetchCategories, createCategory, updateCategory, deleteCategory } from 
 import ViewCategoryModal from "../modals/crud/view/ViewCategoryModal";
 import UpdateCategoryModal from "../modals/crud/update/UpdateCategoryModal";
 import { getCategoryColor } from "../../utils/ColorUtils";
+import { useAlert } from "../../contexts/AlertContext";
 
 type Category = {
   id: number;
@@ -25,8 +26,9 @@ interface Props {
   requestRefresh: RefreshActions;
 }
 
-const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
 
+
+const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -37,6 +39,8 @@ const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   const [isUpdateOpen, setUpdateOpen] = useState(false);
+
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     const load = async () => {
@@ -66,7 +70,11 @@ const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
       setModalOpen(false);
       triggerAllSections();
     } catch (err) {
-      alert((err as Error).message);
+      showAlert({
+        title: "Cannot create category",
+        message: (err as Error).message,
+        intent: "error",
+      });
     }
   };
 
@@ -78,15 +86,15 @@ const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
       setViewOpen(false);
       triggerAllSections();
     } catch (err) {
-      alert((err as Error).message);
+      showAlert({
+        title: "Cannot update category",
+        message: (err as Error).message,
+        intent: "error",
+      });
     }
   };
 
   const handleDeleteCategory = async (cat: Category) => {
-    const confirmed = window.confirm(
-      `Delete “${cat.tscName}”? This cannot be undone.`
-    );
-    if (!confirmed) return;
 
     try {
       await deleteCategory(cat.id);
@@ -94,7 +102,11 @@ const TechStackCategoriesSection: React.FC<Props> = ({ requestRefresh }) => {
       setViewOpen(false);
       triggerAllSections();
     } catch (err) {
-      alert((err as Error).message);
+      showAlert({
+        title: "Cannot delete category",
+        message: (err as Error).message,
+        intent: "warning",
+      });
     }
   };
   

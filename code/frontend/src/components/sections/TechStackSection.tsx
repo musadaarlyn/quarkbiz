@@ -8,6 +8,7 @@ import AddTechStackModal from "../modals/crud/add/AddTechStackModal";
 import ViewTechStackModal from "../modals/crud/view/ViewTechStackModal";
 import UpdateTechStackModal from "../modals/crud/update/UpdateTechStackModal";
 import { getCategoryColor, getCategorySoftGradient } from "../../utils/ColorUtils";
+import { useAlert } from "../../contexts/AlertContext";
 
 type RefreshActions = {
   categories: () => void;
@@ -48,6 +49,7 @@ const TechStackSection: React.FC<Props> = ({ categoryRefreshKey, requestRefresh 
 
  const[category, setCategory] = useState<Category| null>(null);
 
+ const { showAlert } = useAlert();
 
  useEffect(() => {
      const load = async () => {
@@ -92,7 +94,11 @@ const TechStackSection: React.FC<Props> = ({ categoryRefreshKey, requestRefresh 
          setModalOpen(false);
          triggerAllSections();
        } catch (err) {
-         alert((err as Error).message);
+         showAlert({
+          title: "Cannot create tech stack",
+          message: (err as Error).message,
+          intent: "error",
+        });
        }
     };
 
@@ -108,15 +114,15 @@ const TechStackSection: React.FC<Props> = ({ categoryRefreshKey, requestRefresh 
         setViewOpen(false);
         triggerAllSections();
         } catch (err) {
-          alert((err as Error).message);
+          showAlert({
+            title: "Cannot update tech stack",
+            message: (err as Error).message,
+            intent: "error",
+          });
         }
       };
     
       const handleDeleteTechStack = async (stack: Stack) => {
-        const confirmed = window.confirm(
-          `Delete “${stack.tsName}”? This cannot be undone.`
-        );
-        if (!confirmed) return;
     
         try {
           await deleteTechStack(stack.id);
@@ -124,7 +130,11 @@ const TechStackSection: React.FC<Props> = ({ categoryRefreshKey, requestRefresh 
           setViewOpen(false);
           triggerAllSections();
         } catch (err) {
-          alert((err as Error).message);
+          showAlert({
+            title: "Cannot delete tech stack",
+            message: (err as Error).message,
+            intent: "warning",
+          });
         }
       };
 

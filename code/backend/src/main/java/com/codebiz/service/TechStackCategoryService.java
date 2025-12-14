@@ -149,5 +149,4 @@ public class TechStackCategoryService {
                 "Cannot delete category while " + stackCount + " tech stack(s) still reference it");
         }
     }
-
 }
