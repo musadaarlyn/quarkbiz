@@ -8,6 +8,19 @@ import AddTechStackModal from "../modals/add/AddTechStackModal";
 import ViewTechStackModal from "../modals/view/ViewTechStackModal";
 import UpdateTechStackModal from "../modals/update/UpdateTechStackModal";
 
+type RefreshActions = {
+  categories: () => void;
+  stacks: () => void;
+  projects: () => void;
+};
+
+interface Props {
+  refreshKey: number;
+  requestRefresh: RefreshActions;
+  categoryRefreshKey: number;
+}
+
+
 type Stack = {
   id: number;
   tsName: string;
@@ -20,7 +33,7 @@ type Category = {
   tscName: string;
 };
 
-const TechStackSection = () => {
+const TechStackSection: React.FC<Props> = ({ refreshKey, categoryRefreshKey, requestRefresh }) => {
 
  const [stacks, setTechStacks] = useState<Stack[]>([]);
 
@@ -49,7 +62,13 @@ const TechStackSection = () => {
        }
      };
      load();
-   }, []);
+   }, [refreshKey]);
+
+   const triggerAllSections = () => {
+    requestRefresh.categories();
+    requestRefresh.stacks();
+    requestRefresh.projects();
+   };
 
    const getCategoryName = async (category?: number)  => {
       try {
@@ -71,6 +90,7 @@ const TechStackSection = () => {
          const created = await createTechStack({ tsName: name, tsDescription: description, categoryId:  category});
          setTechStacks((prev) => [...prev, created]);
          setModalOpen(false);
+         triggerAllSections();
        } catch (err) {
          alert((err as Error).message);
        }
@@ -86,6 +106,7 @@ const TechStackSection = () => {
         setTechStacks((prev) => prev.map((c) => (c.id === id ? updated : c)));
         setUpdateOpen(false);
         setViewOpen(false);
+        triggerAllSections();
         } catch (err) {
           alert((err as Error).message);
         }
@@ -101,6 +122,7 @@ const TechStackSection = () => {
           await deleteTechStack(stack.id);
           setTechStacks((prev) => prev.filter((c) => c.id !== stack.id));
           setViewOpen(false);
+          triggerAllSections();
         } catch (err) {
           alert((err as Error).message);
         }
@@ -134,6 +156,7 @@ const TechStackSection = () => {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleAddStack}
+        categoryRefreshKey={categoryRefreshKey}
       />
 
       <ViewTechStackModal
@@ -150,6 +173,7 @@ const TechStackSection = () => {
         stack={selectedStack}
         onClose={() => setUpdateOpen(false)}
         onSubmit={handleUpdateTechStack}
+        categoryRefreshKey={categoryRefreshKey}
       />
     </SectionWrapper>
   );

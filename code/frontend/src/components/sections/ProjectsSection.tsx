@@ -8,6 +8,18 @@ import AddProjectModal from "../modals/add/AddProjectModal";
 import ViewProjectModal from "../modals/view/ViewProjectModal";
 import UpdateProjectModal from "../modals/update/UpdateProjectModal";
 
+type RefreshActions = {
+  categories: () => void;
+  stacks: () => void;
+  projects: () => void;
+};
+
+interface Props {
+  refreshKey: number;
+  requestRefresh: RefreshActions;
+  stackRefreshKey: number;
+}
+
 type Project = {
   id: number;
   projName: string;
@@ -25,7 +37,7 @@ type TechStack = {
   tsName: string;
 };
 
-const ProjectsSection = () => {
+const ProjectsSection: React.FC<Props> = ({ refreshKey, requestRefresh, stackRefreshKey }) => {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [techStacks, setTechStacks] = useState<TechStack[]>([]);
@@ -57,7 +69,13 @@ const ProjectsSection = () => {
       }
     };
     load();
-  }, []);
+  }, [refreshKey]);
+
+  const triggerAllSections = () => {
+    requestRefresh.categories();
+    requestRefresh.stacks();
+    requestRefresh.projects();
+  };
 
   const getTechStackNames = (ids: number[]): string[] => {
     if (!ids || ids.length === 0) return [];
@@ -93,6 +111,7 @@ const ProjectsSection = () => {
       });
       setProjects((prev) => [...prev, created]);
       setModalOpen(false);
+      triggerAllSections();
     } catch (err) {
       alert((err as Error).message);
     }
@@ -126,6 +145,7 @@ const ProjectsSection = () => {
       setProjects((prev) => prev.map((p) => (p.id === id ? updated : p)));
       setUpdateOpen(false);
       setViewOpen(false);
+      triggerAllSections();
     } catch (err) {
       alert((err as Error).message);
     }
@@ -141,6 +161,7 @@ const ProjectsSection = () => {
       await deleteProject(project.id);
       setProjects((prev) => prev.filter((p) => p.id !== project.id));
       setViewOpen(false);
+      triggerAllSections();
     } catch (err) {
       alert((err as Error).message);
     }
@@ -148,7 +169,7 @@ const ProjectsSection = () => {
 
   // RETURN -----------------------------------------
   return (
-    <SectionWrapper id="projects" title="Projects" className="mt-20">
+    <SectionWrapper id="projects" title="Projects">
       {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
       {isLoading ? (
         <p className="text-sm text-slate-500">Loading projects…</p>
@@ -173,6 +194,7 @@ const ProjectsSection = () => {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleAddProject}
+        stackRefreshKey={stackRefreshKey}
       />
 
       <ViewProjectModal
@@ -192,6 +214,7 @@ const ProjectsSection = () => {
         project={selectedProject}
         onClose={() => setUpdateOpen(false)}
         onSubmit={handleUpdateProject}
+        stackRefreshKey={stackRefreshKey}
       />
     </SectionWrapper>
   );

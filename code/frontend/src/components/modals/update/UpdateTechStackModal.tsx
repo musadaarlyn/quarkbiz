@@ -12,9 +12,10 @@ interface Props {
   stack: { id: number; tsName: string; tsDescription?: string | null; categoryId?: number } | null;
   onClose: () => void;
   onSubmit: (id: number, name: string, description?: string, category?: number) => void;
+  categoryRefreshKey: number;
 }
 
-const UpdateTechStackModal: React.FC<Props> = ({ isOpen, stack, onClose, onSubmit }) => {
+const UpdateTechStackModal: React.FC<Props> = ({ isOpen, stack, onClose, onSubmit, categoryRefreshKey }) => {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setLoading] = useState(true);
@@ -38,7 +39,7 @@ const UpdateTechStackModal: React.FC<Props> = ({ isOpen, stack, onClose, onSubmi
           }
         };
         load();
-      }, []);
+      }, [isOpen, categoryRefreshKey]);
 
   // load tech stack deets
   useEffect(() => {

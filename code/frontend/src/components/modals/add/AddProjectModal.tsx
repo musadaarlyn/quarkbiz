@@ -19,9 +19,10 @@ interface Props {
     startDate?: string,
     endDate?: string
   ) => void;
+  stackRefreshKey: number;
 }
 
-const AddProjectModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
+const AddProjectModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, stackRefreshKey }) => {
 
     const [stacks, setTechStacks] = useState<TechStack[]>([]);
     const [isLoading, setLoading] = useState(true);
@@ -48,7 +49,7 @@ const AddProjectModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
         }
         };
         load();
-    }, []);
+    }, [isOpen, stackRefreshKey]);
 
     const toggleStack = (id: number) => {
         setSelectedStacks((prev) =>

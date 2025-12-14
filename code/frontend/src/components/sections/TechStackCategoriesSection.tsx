@@ -13,7 +13,19 @@ type Category = {
   tscDescription?: string | null;
 };
 
-const TechStackCategoriesSection = () => {
+type RefreshActions = {
+  categories: () => void;
+  stacks: () => void;
+  projects: () => void;
+};
+
+interface Props {
+  refreshKey: number;
+  requestRefresh: RefreshActions;
+}
+
+const TechStackCategoriesSection: React.FC<Props> = ({ refreshKey, requestRefresh }) => {
+
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -38,13 +50,20 @@ const TechStackCategoriesSection = () => {
       }
     };
     load();
-  }, []);
+  }, [refreshKey]);
+
+  const triggerAllSections = () => {
+    requestRefresh.categories();
+    requestRefresh.stacks();
+    requestRefresh.projects();
+  };
 
   const handleAddCategory = async (name: string, description?: string) => {
     try {
       const created = await createCategory({ tscName: name, tscDescription: description });
       setCategories((prev) => [...prev, created]);
       setModalOpen(false);
+      triggerAllSections();
     } catch (err) {
       alert((err as Error).message);
     }
@@ -56,6 +75,7 @@ const TechStackCategoriesSection = () => {
       setCategories((prev) => prev.map((c) => (c.id === id ? updated : c)));
       setUpdateOpen(false);
       setViewOpen(false);
+      triggerAllSections();
     } catch (err) {
       alert((err as Error).message);
     }
@@ -71,6 +91,7 @@ const TechStackCategoriesSection = () => {
       await deleteCategory(cat.id);
       setCategories((prev) => prev.filter((c) => c.id !== cat.id));
       setViewOpen(false);
+      triggerAllSections();
     } catch (err) {
       alert((err as Error).message);
     }

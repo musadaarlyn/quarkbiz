@@ -11,9 +11,10 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (name: string, description: string, categoryId: number) => void;
+  categoryRefreshKey: number; 
 }
 
-const AddTechStackModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
+const AddTechStackModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, categoryRefreshKey }) => {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setLoading] = useState(true);
@@ -36,7 +37,7 @@ const AddTechStackModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
         }
       };
       load();
-    }, []);
+    }, [isOpen, categoryRefreshKey]);
 
   const handleSubmit = () => {
     if (!name.trim()) return;

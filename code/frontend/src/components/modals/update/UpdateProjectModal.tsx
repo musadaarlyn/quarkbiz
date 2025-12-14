@@ -30,13 +30,15 @@ interface Props {
     startDate?: string,
     endDate?: string
   ) => void;
+  stackRefreshKey: number;
 }
 
 const UpdateProjectModal: React.FC<Props> = ({ 
   isOpen, 
   project, 
   onClose, 
-  onSubmit 
+  onSubmit,
+  stackRefreshKey 
 }) => {
 
   const [stacks, setTechStacks] = useState<TechStack[]>([]);
@@ -65,7 +67,7 @@ const UpdateProjectModal: React.FC<Props> = ({
       }
     };
     load();
-  }, []);
+  }, [isOpen, stackRefreshKey]);
 
   // load project details
   useEffect(() => {
