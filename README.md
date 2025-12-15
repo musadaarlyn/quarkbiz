@@ -42,12 +42,4 @@ code/
     └── ...
 ```
 
-
-This README combines the key information from both the frontend and backend READMEs while providing a comprehensive overview of the entire project. It includes:
-1. A brief description of the project
-2. Key features of both frontend and backend
-3. Setup instructions for both parts
-4. Project structure
-5. Development commands
-6. API documentation links
-7. Contributing guidelines and license information
+**frontend & backend have separate README**
