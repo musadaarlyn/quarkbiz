@@ -12,9 +12,9 @@ You can run your application in dev mode that enables live coding using:
 ./mvnw quarkus:dev
 ```
 
-# 🦆 **QuarkusBiz Backend — Quarkus 3 REST API**
+# 🦆 **QuarkBiz Backend — Quarkus 3 REST API**
 
-This repository contains the backend API for the 🦆🦆🦆 **QuarkusBiz** 🦆🦆🦆 built with **Quarkus 3**, following a clean, layered architecture using REST, DTOs, Panache ORM, and MySQL.
+This repository contains the backend API for the 🦆🦆🦆 **QuarkBiz** 🦆🦆🦆 built with **Quarkus 3**, following a clean, layered architecture using REST, DTOs, Panache ORM, and MySQL.
 
 The backend exposes CRUD and search endpoints for:
 
