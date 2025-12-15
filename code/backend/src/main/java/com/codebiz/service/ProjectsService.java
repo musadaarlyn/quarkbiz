@@ -130,13 +130,21 @@ public class ProjectsService {
     private void validateBusinessRules(ProjectsRequestDTO dto) {
 
         // Project name uniqueness checked separately
-        if (dto.projName.isBlank())
+        if (dto.projName == null || dto.projName.isBlank())
             throw new BadRequestException("Project name is required");
 
-        // Validate status
-        List<String> allowedStatuses = List.of("PLANNING", "IN_PROGRESS", "COMPLETED", "ON_HOLD");
-        if (!allowedStatuses.contains(dto.status.toUpperCase()))
-            throw new BadRequestException("Invalid status: " + dto.status);
+        // Validate status - match database ENUM values EXACTLY
+        List<String> allowedStatuses = List.of("Planning", "In Progress", "Completed", "On Hold");
+        
+        // Check if status is provided and valid
+        if (dto.status == null || dto.status.isBlank()) {
+            throw new BadRequestException("Status is required");
+        }
+        
+        if (!allowedStatuses.contains(dto.status)) {
+            throw new BadRequestException("Invalid status: " + dto.status + 
+                ". Allowed values: Planning, In Progress, Completed, On Hold");
+        }
 
         // Validate date formats
         LocalDate start = parseDate(dto.startDate, "startDate");
