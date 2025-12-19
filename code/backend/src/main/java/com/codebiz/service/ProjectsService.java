@@ -122,7 +122,7 @@ public class ProjectsService {
                 .map(ProjectsMapper::toDTO)
                 .toList();
     }
-
+ 
     // -------------------------------------
     // VALIDATION HELPERS 
     // -------------------------------------

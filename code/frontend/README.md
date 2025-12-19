@@ -1,5 +1,92 @@
 # React + TypeScript + Vite
 
+# 🦆 **QuarkBiz Frontend — React TypeScript Application**
+
+This repository contains the frontend for the 🦆🦆🦆 **QuarkBiz** 🦆🦆🦆 built with **React 18**, **TypeScript**, and **Vite**, following modern React patterns and best practices.
+
+The frontend provides a responsive UI for:
+
+* **TechStack Categories** management
+* **TechStacks** management
+* **Projects** management
+
+---
+
+# 🏗️ **Architecture Overview**
+
+### ✔ Component-Based Architecture
+
+```
+Pages         →  Top-level route components
+Components    →  Reusable UI components
+Hooks         →  Custom React hooks
+Services      →  API clients and data fetching
+Store         →  State management
+Types         →  TypeScript type definitions
+Utils         →  Helper functions and utilities
+```
+
+### ✔ Main Technologies
+
+| Feature        | Stack                      |
+| -------------- | -------------------------- |
+| Framework      | **React 18**               |
+| Build Tool     | Vite                       |
+| Language       | TypeScript                 |
+| Styling        | Tailwind CSS               |
+| State Management| React Context / Redux      |
+| HTTP Client    | Axios / Fetch API          |
+| Form Handling  | React Hook Form            |
+| Routing        | React Router               |
+| Testing        | Jest + React Testing Library|
+
+---
+
+# 📁 **Project Structure**
+
+```
+src/
+│
+├── components/     ← Reusable UI components
+├── pages/          ← Page components (routes)
+├── hooks/          ← Custom React hooks
+├── services/       ← API clients and services
+├── store/          ← State management
+├── types/          ← TypeScript type definitions
+├── utils/          ← Utility functions
+└── styles/         ← Global styles and themes
+```
+
+---
+
+# 🔥 **Key Features**
+
+### ✔ Modern React Patterns
+
+- Functional components with hooks
+- Type-safe with TypeScript
+- Component composition
+- Custom hooks for logic reuse
+
+### ✔ Responsive Design
+
+- Mobile-first approach
+- Responsive layouts with Tailwind CSS
+- Accessible components
+
+### ✔ State Management
+
+- Context API for global state
+- Optimized re-renders
+- Persisted state where needed
+
+### ✔ API Integration
+
+- Type-safe API clients
+- Error handling
+- Loading states
+- Request/response interceptors
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

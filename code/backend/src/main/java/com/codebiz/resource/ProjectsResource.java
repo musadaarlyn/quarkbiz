@@ -20,7 +20,7 @@ public class ProjectsResource {
 
     @Inject
     ProjectsService service;
-
+ 
     // CREATE
     @POST
     @Transactional
