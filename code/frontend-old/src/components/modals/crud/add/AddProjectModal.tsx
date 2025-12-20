@@ -83,7 +83,7 @@ const AddProjectModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, stackRefr
         if (!startDate) {
             newErrors.startDate = "Start date is required";
         }
-
+ 
         if (!endDate) {
             newErrors.endDate = "End date is required";
         }

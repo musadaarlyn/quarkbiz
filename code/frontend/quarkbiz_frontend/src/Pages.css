@@ -1,0 +1,11 @@
+.projects-wrapper button {
+    margin: 10px;
+}
+
+.projects-wrapper button a {
+    text-decoration: none;
+}
+
+.form input, textarea, select{
+    width: 30vw;
+}

@@ -178,7 +178,7 @@ const ProjectsSection: React.FC<Props> = ({ requestRefresh, stackRefreshKey }) =
         intent: "warning",
       });
     }
-  };
+  }; 
 
   // RETURN -----------------------------------------
   return (
