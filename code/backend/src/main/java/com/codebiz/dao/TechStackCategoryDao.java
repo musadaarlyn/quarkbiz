@@ -15,12 +15,10 @@ public class TechStackCategoryDao {
     @Inject
     DataSource dataSource;
 
-    // Whitelist allowed sort fields (VERY IMPORTANT)
     private static final List<String> ALLOWED_SORT_FIELDS = List.of("tscName", "createdAt", "updatedAt");
 
-    // ------------------------------------------------
     // FIND ALL
-    // ------------------------------------------------
+    // -------------------------------------------------------------------------- >
     public List<TechStackCategory> findAll() {
         List<TechStackCategory> categories = new ArrayList<>();
 
@@ -44,9 +42,8 @@ public class TechStackCategoryDao {
         return categories;
     }
 
-    // ------------------------------------------------
     // FIND BY ID
-    // ------------------------------------------------
+    // -------------------------------------------------------------------------- >
     public TechStackCategory findById(Long id) {
         String sql = """
                     SELECT id, tscName, tscDescription, createdAt, updatedAt
@@ -71,9 +68,8 @@ public class TechStackCategoryDao {
         return null;
     }
 
-    // ------------------------------------------------
     // PAGINATION
-    // ------------------------------------------------
+    // -------------------------------------------------------------------------- >
     public List<TechStackCategory> findPaginated(int page, int size) {
         List<TechStackCategory> categories = new ArrayList<>();
 
@@ -102,9 +98,8 @@ public class TechStackCategoryDao {
         return categories;
     }
 
-    // ------------------------------------------------
-    // SEARCH + SORT + PAGINATION
-    // ------------------------------------------------
+    // SEARCH , SORT , PAGINATION
+    // -------------------------------------------------------------------------- >
     public List<TechStackCategory> search(
             String name,
             String sortField,
@@ -155,9 +150,8 @@ public class TechStackCategoryDao {
         return categories;
     }
 
-    // ------------------------------------------------
     // CREATE
-    // ------------------------------------------------
+    // -------------------------------------------------------------------------- >
     public void insert(TechStackCategory category) {
         String sql = """
                     INSERT INTO tech_stack_category (tscName, tscDescription)
@@ -182,9 +176,8 @@ public class TechStackCategoryDao {
         }
     }
 
-    // ------------------------------------------------
     // UPDATE
-    // ------------------------------------------------
+    // -------------------------------------------------------------------------- >
     public void update(TechStackCategory category) {
         String sql = """
                     UPDATE tech_stack_category
@@ -205,9 +198,8 @@ public class TechStackCategoryDao {
         }
     }
 
-    // ------------------------------------------------
     // DELETE
-    // ------------------------------------------------
+    // -------------------------------------------------------------------------- >
     public void delete(Long id) {
         String sql = "DELETE FROM tech_stack_category WHERE id = ?";
 
@@ -221,9 +213,8 @@ public class TechStackCategoryDao {
         }
     }
 
-    // ------------------------------------------------
     // VALIDATION HELPERS
-    // ------------------------------------------------
+    // -------------------------------------------------------------------------- >
     public boolean existsByNameIgnoreCase(String name) {
         String sql = """
                     SELECT 1
@@ -294,9 +285,8 @@ public class TechStackCategoryDao {
         return 0;
     }
 
-    // ------------------------------------------------
     // ROW MAPPER
-    // ------------------------------------------------
+    // -------------------------------------------------------------------------- >
     private TechStackCategory mapRow(ResultSet rs) throws SQLException {
         TechStackCategory c = new TechStackCategory();
         c.id = rs.getLong("id");

@@ -5,7 +5,6 @@ import com.codebiz.dao.TechStackCategoryDao;
 import com.codebiz.dto.techstack.TechStackRequestDTO;
 import com.codebiz.dto.techstack.TechStackResponseDTO;
 import com.codebiz.mapper.techstack.TechStackMapper;
-import com.codebiz.model.Projects;
 import com.codebiz.model.TechStack;
 import com.codebiz.model.TechStackCategory;
 
@@ -27,7 +26,7 @@ public class TechStackService {
     TechStackCategoryDao categoryDao;
 
     // CREATE
-
+    // -------------------------------------------------------------------------- >
     public TechStackResponseDTO create(TechStackRequestDTO dto) {
 
         ensureNameIsUnique(dto.tsName);
@@ -43,6 +42,7 @@ public class TechStackService {
     }
 
     // READ
+    // -------------------------------------------------------------------------- >
     public List<TechStackResponseDTO> listAll() {
         return techStackDao.findAll()
                 .stream()
@@ -60,6 +60,7 @@ public class TechStackService {
     }
 
     // UPDATE
+    // -------------------------------------------------------------------------- >
     public TechStackResponseDTO update(Long id, TechStackRequestDTO dto) {
 
         TechStack existing = techStackDao.findById(id);
@@ -78,6 +79,7 @@ public class TechStackService {
     }
 
     // DELETE
+    // -------------------------------------------------------------------------- >
     public void delete(Long id) {
         TechStack existing = techStackDao.findById(id);
         if (existing == null)
@@ -88,9 +90,8 @@ public class TechStackService {
         techStackDao.delete(existing);
     }
 
-    // -------------------------------------
     // VALIDATION HELPERS
-    // -------------------------------------
+    // -------------------------------------------------------------------------- >
 
     // ENSURE UNIQUE BEFORE CREATE
     private void ensureNameIsUnique(String name) {

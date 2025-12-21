@@ -44,7 +44,6 @@ public class TechStackDao {
 
     // READ
     // -------------------------------------------------------------------------- >
-    // FIND ALL
     public List<TechStack> findAll() {
         List<TechStack> techs = new ArrayList<>();
 
@@ -70,7 +69,6 @@ public class TechStackDao {
         return techs;
     }
 
-    // FIND BY ID
     public TechStack findById(Long id) {
         String sql = """
                     SELECT id, tsName, tsDescription, categoryId, createdAt, updatedAt

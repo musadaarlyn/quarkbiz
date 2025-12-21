@@ -6,7 +6,6 @@ import com.codebiz.dto.projects.ProjectsRequestDTO;
 import com.codebiz.dto.projects.ProjectsResponseDTO;
 import com.codebiz.mapper.projects.ProjectsMapper;
 import com.codebiz.model.Projects;
-import com.codebiz.model.TechStack;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -28,6 +27,7 @@ public class ProjectsService {
     TechStackDao techStackDao;
 
     // CREATE
+    // -------------------------------------------------------------------------- >
     public ProjectsResponseDTO create(ProjectsRequestDTO dto) {
 
         validateBusinessRules(dto);
@@ -43,7 +43,8 @@ public class ProjectsService {
         return ProjectsMapper.toDTO(entity);
     }
 
-    // READ ALL
+    // READ
+    // -------------------------------------------------------------------------- >
     public List<ProjectsResponseDTO> getAll() {
         return projectsDao.findAll()
                 .stream()
@@ -51,7 +52,6 @@ public class ProjectsService {
                 .toList();
     }
 
-    // READ BY ID
     public ProjectsResponseDTO getById(Long id) {
         Projects entity = projectsDao.findById(id);
         if (entity == null)
@@ -61,6 +61,7 @@ public class ProjectsService {
     }
 
     // UPDATE
+    // -------------------------------------------------------------------------- >
     public ProjectsResponseDTO update(Long id, ProjectsRequestDTO dto) {
         Projects existing = projectsDao.findById(id);
         if (existing == null)
@@ -77,15 +78,14 @@ public class ProjectsService {
     }
 
     // DELETE
+    // -------------------------------------------------------------------------- >
     public void delete(Long id) {
         if (!projectsDao.delete(id))
             throw new NotFoundException("Project not found: " + id);
     }
 
-    // -------------------------------------
     // VALIDATION HELPERS
-    // -------------------------------------
-
+    // -------------------------------------------------------------------------- >
     private void validateBusinessRules(ProjectsRequestDTO dto) {
 
         // Project name uniqueness checked separately

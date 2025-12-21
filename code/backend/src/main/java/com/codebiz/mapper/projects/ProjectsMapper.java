@@ -3,15 +3,10 @@ package com.codebiz.mapper.projects;
 import com.codebiz.dto.projects.ProjectsRequestDTO;
 import com.codebiz.dto.projects.ProjectsResponseDTO;
 import com.codebiz.model.Projects;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public class ProjectsMapper {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // ENTITY → DTO
     public static ProjectsResponseDTO toDTO(Projects entity) {

@@ -54,8 +54,8 @@ function CreateProject() {
             });
 
             alert("Project Added");
-        } catch(err) {
-            alert("Error creating project");
+        } catch (err: any) {
+        alert(err.message);
         }
     };
 

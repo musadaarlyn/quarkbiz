@@ -20,9 +20,8 @@ public class TechStackCategoryService {
     @Inject
     TechStackCategoryDao categoryDao;
 
-    // -------------------------------------
     // CREATE
-    // -------------------------------------
+    // -------------------------------------------------------------------------- >
     public TechStackCategoryResponseDTO create(TechStackCategoryRequestDTO dto) {
 
         ensureNameIsUnique(dto.tscName);
@@ -36,9 +35,8 @@ public class TechStackCategoryService {
         return TechStackCategoryMapper.toDTO(entity);
     }
 
-    // -------------------------------------
     // READ ALL
-    // -------------------------------------
+    // -------------------------------------------------------------------------- >
     public List<TechStackCategoryResponseDTO> listAll() {
         return categoryDao.findAll()
                 .stream()
@@ -46,9 +44,8 @@ public class TechStackCategoryService {
                 .toList();
     }
 
-    // -------------------------------------
     // READ BY ID
-    // -------------------------------------
+    // -------------------------------------------------------------------------- >
     public TechStackCategoryResponseDTO findById(Long id) {
         TechStackCategory entity = categoryDao.findById(id);
         if (entity == null)
@@ -57,9 +54,8 @@ public class TechStackCategoryService {
         return TechStackCategoryMapper.toDTO(entity);
     }
 
-    // -------------------------------------
     // PAGINATION
-    // -------------------------------------
+    // -------------------------------------------------------------------------- >
     public List<TechStackCategoryResponseDTO> paginate(int page, int size) {
         return categoryDao.findPaginated(page, size)
                 .stream()
@@ -67,9 +63,8 @@ public class TechStackCategoryService {
                 .toList();
     }
 
-    // -------------------------------------
     // SEARCH + SORT + PAGINATION
-    // -------------------------------------
+    // -------------------------------------------------------------------------- >
     public List<TechStackCategoryResponseDTO> search(
             String name,
             String sortField,
@@ -82,9 +77,8 @@ public class TechStackCategoryService {
                 .toList();
     }
 
-    // -------------------------------------
     // UPDATE
-    // -------------------------------------
+    // -------------------------------------------------------------------------- >
     public TechStackCategoryResponseDTO update(Long id, TechStackCategoryRequestDTO dto) {
 
         TechStackCategory existing = categoryDao.findById(id);
@@ -101,9 +95,7 @@ public class TechStackCategoryService {
         return TechStackCategoryMapper.toDTO(existing);
     }
 
-    // -------------------------------------
     // DELETE
-    // -------------------------------------
     public boolean delete(Long id) {
 
         TechStackCategory existing = categoryDao.findById(id);
@@ -116,10 +108,8 @@ public class TechStackCategoryService {
         return true;
     }
 
-    // -------------------------------------
     // VALIDATION HELPERS
-    // -------------------------------------
-
+    // -------------------------------------------------------------------------- >
     private void ensureNameIsUnique(String name) {
         boolean exists = categoryDao.existsByNameIgnoreCase(name);
         if (exists) {

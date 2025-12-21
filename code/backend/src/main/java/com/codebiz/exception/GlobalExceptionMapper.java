@@ -11,32 +11,39 @@ import java.util.stream.Collectors;
 @Provider
 public class GlobalExceptionMapper implements ExceptionMapper<Exception> {
 
-    @Override
-    public Response toResponse(Exception ex) {
+        @Override
+        public Response toResponse(Exception ex) {
 
-        // Handle validation errors (from @Valid)
-        if (ex instanceof ConstraintViolationException cve) {
-            Map<String, String> errors = cve.getConstraintViolations().stream()
-                    .collect(Collectors.toMap(
-                            v -> v.getPropertyPath().toString(),
-                            v -> v.getMessage()
-                    ));
+                // ✅ LET JAX-RS HANDLE HTTP EXCEPTIONS PROPERLY
+                if (ex instanceof jakarta.ws.rs.WebApplicationException wae) {
+                        return Response
+                                        .status(wae.getResponse().getStatus())
+                                        .entity(new ErrorResponse(
+                                                        wae.getResponse().getStatus(),
+                                                        ex.getMessage()))
+                                        .build();
+                }
 
-            ErrorResponse error = new ErrorResponse(
-                    400,
-                    "Validation Failed",
-                    errors
-            );
+                // Handle validation errors (@Valid)
+                if (ex instanceof ConstraintViolationException cve) {
+                        Map<String, String> errors = cve.getConstraintViolations().stream()
+                                        .collect(Collectors.toMap(
+                                                        v -> v.getPropertyPath().toString(),
+                                                        v -> v.getMessage()));
 
-            return Response.status(400).entity(error).build();
+                        return Response.status(400)
+                                        .entity(new ErrorResponse(
+                                                        400,
+                                                        "Validation Failed",
+                                                        errors))
+                                        .build();
+                }
+
+                // Fallback (real 500s only)
+                return Response.status(500)
+                                .entity(new ErrorResponse(
+                                                500,
+                                                "Internal Server Error"))
+                                .build();
         }
-
-        // Default fallback for all other errors
-        ErrorResponse error = new ErrorResponse(
-                500,
-                ex.getMessage() != null ? ex.getMessage() : "Internal Server Error"
-        );
-
-        return Response.status(500).entity(error).build();
-    }
 }
