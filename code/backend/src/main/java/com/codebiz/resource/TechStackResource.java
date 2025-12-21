@@ -27,54 +27,24 @@ public class TechStackResource {
     @POST
     @Transactional
     public Response create(@Valid TechStackRequestDTO dto) {
-        TechStack created = service.create(dto);
+        TechStackResponseDTO created = service.create(dto);
         return Response.status(Response.Status.CREATED)
-                .entity(TechStackMapper.toDTO(created))
+                .entity(created)
                 .build();
     }
 
     // READ ALL
     @GET
     public List<TechStackResponseDTO> listAll() {
-        return service.listAll()
-                .stream()
-                .map(TechStackMapper::toDTO)
-                .toList();
+        return service.listAll();
     }
 
     // READ BY ID
     @GET
     @Path("/{id}")
-    public TechStackResponseDTO getById(@PathParam("id") Long id) {
-        TechStack entity = service.getById(id);
-        return TechStackMapper.toDTO(entity);
-    }
-
-    // PAGINATION
-    @GET
-    @Path("/page")
-    public List<TechStackResponseDTO> paginate(
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size
-    ) {
-        return service.paginate(page, size)
-                .stream()
-                .map(TechStackMapper::toDTO)
-                .toList();
-    }
-
-    // SEARCH
-    @GET
-    @Path("/search")
-    public List<TechStackResponseDTO> search(
-            @QueryParam("name") String name,
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size
-    ) {
-        return service.search(name, page, size)
-                .stream()
-                .map(TechStackMapper::toDTO)
-                .toList();
+    public Response getById(@PathParam("id") Long id) {
+        TechStackResponseDTO dto = service.getById(id);
+        return Response.ok(dto).build();
     }
 
     // UPDATE
@@ -83,10 +53,9 @@ public class TechStackResource {
     @Transactional
     public Response update(
             @PathParam("id") Long id,
-            @Valid TechStackRequestDTO dto
-    ) {
-        TechStack updated = service.update(id, dto);
-        return Response.ok(TechStackMapper.toDTO(updated)).build();
+            @Valid TechStackRequestDTO dto) {
+        TechStackResponseDTO updated = service.update(id, dto);
+        return Response.ok(updated).build();
     }
 
     // DELETE

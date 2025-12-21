@@ -13,29 +13,10 @@ public class ProjectsMapper {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    // JSON → List<Long>
-    private static List<Long> jsonToList(String json) {
-        try {
-            if (json == null || json.isBlank()) return List.of();
-            return objectMapper.readValue(json, new TypeReference<List<Long>>() {});
-        } catch (Exception e) {
-            return List.of(); // fallback
-        }
-    }
-
-    // List<Long> → JSON
-    private static String listToJson(List<Long> list) {
-        try {
-            if (list == null) return "[]"; 
-            return objectMapper.writeValueAsString(list);
-        } catch (Exception e) {
-            return "[]"; // fallback
-        }
-    }
-
     // ENTITY → DTO
     public static ProjectsResponseDTO toDTO(Projects entity) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
 
         ProjectsResponseDTO dto = new ProjectsResponseDTO();
 
@@ -43,7 +24,7 @@ public class ProjectsMapper {
         dto.projName = entity.projName;
         dto.projDescription = entity.projDescription;
 
-        dto.techStackIds = jsonToList(entity.techStackIds);
+        dto.techStackIds = entity.techStackIds;
 
         dto.status = entity.status;
 
@@ -63,7 +44,7 @@ public class ProjectsMapper {
         entity.projName = dto.projName;
         entity.projDescription = dto.projDescription;
 
-        entity.techStackIds = listToJson(dto.techStackIds); 
+        entity.techStackIds = dto.techStackIds;
 
         entity.status = dto.status;
 
@@ -78,7 +59,7 @@ public class ProjectsMapper {
         entity.projName = dto.projName;
         entity.projDescription = dto.projDescription;
 
-        entity.techStackIds = listToJson(dto.techStackIds);
+        entity.techStackIds = dto.techStackIds;
 
         entity.status = dto.status;
 

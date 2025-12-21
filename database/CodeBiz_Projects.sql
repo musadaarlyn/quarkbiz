@@ -19,7 +19,7 @@ CREATE TABLE tech_stack (
     
     FOREIGN KEY (categoryId) REFERENCES tech_stack_category(id) ON DELETE SET NULL
 );
-
+ 
 -- Projects table
 CREATE TABLE projects (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,

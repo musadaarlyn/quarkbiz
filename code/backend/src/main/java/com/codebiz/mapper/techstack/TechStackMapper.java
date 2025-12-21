@@ -8,7 +8,8 @@ public class TechStackMapper {
 
     // ENTITY → DTO
     public static TechStackResponseDTO toDTO(TechStack entity) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
 
         TechStackResponseDTO dto = new TechStackResponseDTO();
         dto.id = entity.id;
@@ -16,7 +17,7 @@ public class TechStackMapper {
         dto.tsDescription = entity.tsDescription;
 
         // category is an object → get its ID
-        dto.categoryId = (entity.category != null) ? entity.category.id : null;
+        dto.categoryId = (entity.category != null) ? entity.category : null;
 
         dto.createdAt = entity.createdAt != null ? entity.createdAt.toString() : null;
         dto.updatedAt = entity.updatedAt != null ? entity.updatedAt.toString() : null;
@@ -25,7 +26,7 @@ public class TechStackMapper {
     }
 
     // DTO → Entity (FOR CREATE)
-    public static TechStack toEntity(TechStackRequestDTO dto, TechStackCategory category) {
+    public static TechStack toEntity(TechStackRequestDTO dto, Long category) {
         TechStack entity = new TechStack();
         entity.tsName = dto.tsName;
         entity.tsDescription = dto.tsDescription;
@@ -33,8 +34,8 @@ public class TechStackMapper {
         return entity;
     }
 
-    // DTO → ENTITY (FOR UPDATE) 
-    public static void updateEntity(TechStack entity, TechStackRequestDTO dto, TechStackCategory category) {
+    // DTO → ENTITY (FOR UPDATE)
+    public static void updateEntity(TechStack entity, TechStackRequestDTO dto, Long category) {
 
         entity.tsName = dto.tsName;
         entity.tsDescription = dto.tsDescription;

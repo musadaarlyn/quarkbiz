@@ -26,7 +26,9 @@ public class TechStackCategoryResource {
     @Transactional
     public Response create(@Valid TechStackCategoryRequestDTO dto) {
         TechStackCategoryResponseDTO created = service.create(dto);
-        return Response.status(Response.Status.CREATED).entity(created).build();
+        return Response.status(Response.Status.CREATED)
+                .entity(created)
+                .build();
     }
 
     // READ ALL
@@ -48,8 +50,7 @@ public class TechStackCategoryResource {
     @Path("/page")
     public List<TechStackCategoryResponseDTO> paginate(
             @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size
-    ) {
+            @QueryParam("size") @DefaultValue("10") int size) {
         return service.paginate(page, size);
     }
 
@@ -61,8 +62,7 @@ public class TechStackCategoryResource {
             @QueryParam("sort") @DefaultValue("id") String sortField,
             @QueryParam("direction") @DefaultValue("asc") String direction,
             @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size
-    ) {
+            @QueryParam("size") @DefaultValue("10") int size) {
         return service.search(name, sortField, direction, page, size);
     }
 

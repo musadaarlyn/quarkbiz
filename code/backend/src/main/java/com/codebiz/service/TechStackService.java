@@ -1,100 +1,91 @@
 package com.codebiz.service;
 
+import com.codebiz.dao.TechStackDao;
+import com.codebiz.dao.TechStackCategoryDao;
 import com.codebiz.dto.techstack.TechStackRequestDTO;
+import com.codebiz.dto.techstack.TechStackResponseDTO;
 import com.codebiz.mapper.techstack.TechStackMapper;
 import com.codebiz.model.Projects;
 import com.codebiz.model.TechStack;
 import com.codebiz.model.TechStackCategory;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @ApplicationScoped
 public class TechStackService {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    @Inject
+    TechStackDao techStackDao;
 
-    // -------------------------------------
-    // CRUD
-    // -------------------------------------
- 
+    @Inject
+    TechStackCategoryDao categoryDao;
+
     // CREATE
-    @Transactional
-    public TechStack create(TechStackRequestDTO dto) {
+
+    public TechStackResponseDTO create(TechStackRequestDTO dto) {
 
         ensureNameIsUnique(dto.tsName);
-        TechStackCategory category = requireCategory(dto.categoryId);
+        Long category = requireCategory(dto.categoryId);
 
         TechStack entity = TechStackMapper.toEntity(dto, category);
         entity.createdAt = LocalDateTime.now();
         entity.updatedAt = LocalDateTime.now();
 
-        entity.persist();
-        return entity;
+        techStackDao.create(entity);
+
+        return TechStackMapper.toDTO(entity);
     }
 
     // READ
-    public List<TechStack> listAll() {
-        return TechStack.listAll();
+    public List<TechStackResponseDTO> listAll() {
+        return techStackDao.findAll()
+                .stream()
+                .map(TechStackMapper::toDTO)
+                .toList();
     }
 
-    public TechStack getById(Long id) {
-        TechStack entity = TechStack.findById(id);
-        if (entity == null) throw new NotFoundException("TechStack not found: " + id);
-        return entity;
-    }
+    public TechStackResponseDTO getById(Long id) {
+        TechStack entity = techStackDao.findById(id);
 
-    public List<TechStack> paginate(int page, int size) {
-        return TechStack.findAll()
-                .page(page, size)
-                .list();
-    }
+        if (entity == null)
+            throw new NotFoundException("TechStack not found: " + id);
 
-    public List<TechStack> search(String name, int page, int size) {
-        if (name == null || name.isBlank()) {
-            return paginate(page, size);
-        }
-
-        return TechStack.find("LOWER(tsName) LIKE LOWER(?1)", "%" + name + "%")
-                .page(page, size)
-                .list();
+        return TechStackMapper.toDTO(entity);
     }
 
     // UPDATE
-    @Transactional
-    public TechStack update(Long id, TechStackRequestDTO dto) {
+    public TechStackResponseDTO update(Long id, TechStackRequestDTO dto) {
 
-        TechStack existing = TechStack.findById(id);
+        TechStack existing = techStackDao.findById(id);
         if (existing == null)
             throw new NotFoundException("TechStack not found: " + id);
 
         ensureNameIsUniqueForUpdate(id, dto.tsName);
-        TechStackCategory category = requireCategory(dto.categoryId);
+        Long category = requireCategory(dto.categoryId);
 
         TechStackMapper.updateEntity(existing, dto, category);
         existing.updatedAt = LocalDateTime.now();
 
-        return existing;
+        techStackDao.update(existing);
+
+        return TechStackMapper.toDTO(existing);
     }
 
     // DELETE
-    @Transactional
     public void delete(Long id) {
-        TechStack existing = TechStack.findById(id);
+        TechStack existing = techStackDao.findById(id);
         if (existing == null)
-            throw new NotFoundException("TechStack not found: " + id);
+            throw new NotFoundException("Tech not found: " + id);
 
-        ensureNotUsedByProjects(id);
+        ensureNotUsedByproject(id);
 
-        existing.delete();
+        techStackDao.delete(existing);
     }
 
     // -------------------------------------
@@ -103,50 +94,42 @@ public class TechStackService {
 
     // ENSURE UNIQUE BEFORE CREATE
     private void ensureNameIsUnique(String name) {
-        boolean exists = TechStack.find("LOWER(tsName) = LOWER(?1)", name)
-                .firstResult() != null;
+        boolean exists = techStackDao.existsByNameIgnoreCase(name);
 
-        if (exists)
+        if (exists) {
             throw new BadRequestException("TechStack name already exists");
+        }
     }
 
     // ENSURE UNIQUE BEFORE UPDATE
     private void ensureNameIsUniqueForUpdate(Long id, String name) {
-        TechStack found = TechStack.find("LOWER(tsName) = LOWER(?1)", name)
-                .firstResult();
+        TechStack found = techStackDao.findByNameIgnoreCase(name);
 
-        if (found != null && !found.id.equals(id))
+        if (found != null && !found.id.equals(id)) {
             throw new BadRequestException("TechStack name already exists");
+        }
     }
 
     // REQUIRE CATEGORY
-    private TechStackCategory requireCategory(Long id) {
+    private Long requireCategory(Long id) {
         if (id == null)
             throw new BadRequestException("categoryId is required");
 
-        TechStackCategory category = TechStackCategory.findById(id);
-        if (category == null)
+        TechStackCategory category = categoryDao.findById(id);
+        if (category == null) {
             throw new NotFoundException("Category does not exist: " + id);
+        }
 
-        return category;
+        return category.id;
     }
 
     // ENSURE NO PROJECTS BEFORE DELETE
-    private void ensureNotUsedByProjects(Long techStackId) {
-        for (Projects project : Projects.<Projects>listAll()) {
-            if (readTechStackIds(project.techStackIds).contains(techStackId)) {
-                throw new BadRequestException(
-                    "Cannot delete tech stack while it is used by project: " + project.projName);
-            }
+    private void ensureNotUsedByproject(Long techStackId) {
+        boolean isUsedByProject = techStackDao.isUsedByProject(techStackId);
+
+        if (isUsedByProject) {
+            throw new BadRequestException("TechStack used by project/s");
         }
     }
 
-    private List<Long> readTechStackIds(String json) {
-        try {
-            if (json == null || json.isBlank()) return List.of();
-            return objectMapper.readValue(json, new TypeReference<List<Long>>() {});
-        } catch (Exception e) {
-            return List.of();
-        }
-    }
 }

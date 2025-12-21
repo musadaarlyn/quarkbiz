@@ -1,40 +1,26 @@
 package com.codebiz.model;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Entity
-@Table(name = "projects")
-public class Projects extends PanacheEntityBase {
+public class Projects {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @Column(name = "projName", nullable = false)
     public String projName;
 
-    @Column(name = "projDescription")
     public String projDescription;
 
-    // Stored as JSON in MySQL → Scalable + easy
-    @Column(name = "techStackIds", columnDefinition = "JSON")
-    public String techStackIds;
+    public List<Long> techStackIds;
 
-    @Column(name = "status")
     public String status;
 
-    @Column(name = "startDate")
     public LocalDate startDate;
 
-    @Column(name = "endDate")
     public LocalDate endDate;
 
-    @Column(name = "createdAt")
     public LocalDateTime createdAt;
 
-    @Column(name = "updatedAt")
     public LocalDateTime updatedAt;
 }

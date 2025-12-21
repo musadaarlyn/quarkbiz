@@ -20,7 +20,7 @@ public class ProjectsResource {
 
     @Inject
     ProjectsService service;
- 
+
     // CREATE
     @POST
     @Transactional
@@ -41,20 +41,6 @@ public class ProjectsResource {
     public Response getById(@PathParam("id") Long id) {
         ProjectsResponseDTO dto = service.getById(id);
         return Response.ok(dto).build();
-    }
-
-    // SEARCH + FILTER + SORT + PAGINATION
-    @GET
-    @Path("/search")
-    public List<ProjectsResponseDTO> search(
-            @QueryParam("name") String name,
-            @QueryParam("status") String status,
-            @QueryParam("sort") @DefaultValue("id") String sort,
-            @QueryParam("direction") @DefaultValue("asc") String direction,
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size
-    ) {
-        return service.search(name, status, sort, direction, page, size);
     }
 
     // UPDATE
