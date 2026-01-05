@@ -1,4 +1,5 @@
-const base = 'http://localhost:8080/categories';
+import { API_BASE_URL } from "../config/api";
+const base = `${API_BASE_URL}/categories`;
 
 // HANDLE RESPONSE
 async function handleResponse(res: Response) {

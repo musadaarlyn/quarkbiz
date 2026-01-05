@@ -1,4 +1,5 @@
-const base = 'http://localhost:8080/dashboard';
+import { API_BASE_URL } from "../config/api";
+const base = `${API_BASE_URL}/dashboard`;
 
 export type DashboardStats = {
   totalProjects: number;

@@ -1,4 +1,5 @@
-const base = 'http://localhost:8080/projects';
+import { API_BASE_URL } from "../config/api";
+const base = `${API_BASE_URL}/projects`;
 
 // FETCH PROJECTS
 export async function fetchProjects() {

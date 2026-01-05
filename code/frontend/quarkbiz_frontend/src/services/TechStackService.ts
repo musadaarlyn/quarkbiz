@@ -1,4 +1,5 @@
-const base = 'http://localhost:8080/techstack';
+import { API_BASE_URL } from "../config/api";
+const base = `${API_BASE_URL}/techstack`;
 
 export async function fetchTechStacks() {
   const res = await fetch(`${base}`);
