@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { fetchTechStacks } from "../../services/TechStackService";
 import { createProject } from "../../services/ProjectsService";
 
-type Stack = {
+type Tech = {
     id: number,
     tsName: string
 };
@@ -19,14 +19,14 @@ function CreateProject() {
     const [endDate, setEndDate] = useState("");
 
     // tech stack list for dropdown input
-    const [techStacks, getTechStacks] = useState<Stack[]>([]);
+    const [techs, getTechStacks] = useState<Tech[]>([]);
 
     const loadStacks = async() => {
         const stacksData = await fetchTechStacks();
         getTechStacks(stacksData);
     }
 
-    // load page
+    // load data
     useEffect( () => {
         loadStacks();
     }, []
@@ -54,10 +54,22 @@ function CreateProject() {
             });
 
             alert("Project Added");
+
+            resetForm();
         } catch (err: any) {
         alert(err.message);
         }
     };
+
+    const resetForm = () => {
+        setProjName("");
+        setDescription("");
+        setTechStacks([]);
+        setStatus("Planning");
+        setStartDate("");
+        setEndDate("");
+    };
+
 
     // -------------- RETURN -----------------------
     return (
@@ -106,7 +118,7 @@ function CreateProject() {
                     >
                         {/* display techs in multi select */}
                         {
-                            techStacks.map(
+                            techs.map(
                                 (tech) => (
                                     <option key={tech.id} value={tech.id}>{tech.tsName}</option>
                                 )
@@ -123,7 +135,7 @@ function CreateProject() {
                         onChange={(e) => setStatus(e.target.value as 'Planning' | 'In Progress' | 'Completed' | 'On Hold')}
                         required
                     >
-                        <option value='Planning' selected>Planning</option>
+                        <option value='Planning'>Planning</option>
                         <option value='In Progress'>In Progress</option>
                         <option value='Completed'>Completed</option>
                         <option value='On Hold'>On Hold</option>
