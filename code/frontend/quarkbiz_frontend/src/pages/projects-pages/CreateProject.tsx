@@ -89,7 +89,7 @@ function CreateProject() {
   const [projDescription, setDescription] = useState("");
   const [techStackIds, setTechStacks] = useState<number[]>([]);
 
-  const [projectStatus, dispatchDates] = useReducer(statusReducer, initialState);
+  const [projectStatus, dispatchStatus] = useReducer(statusReducer, initialState);
 
   const [techs, getTechStacks] = useState<Tech[]>([]);
 
@@ -195,7 +195,7 @@ function CreateProject() {
           <input
             type="date"
             value={projectStatus.startDate}
-            onChange={(e) => dispatchDates({ action: 'changeStart', payLoad: e.target.value })}
+            onChange={(e) => dispatchStatus({ action: 'changeStart', payLoad: e.target.value })}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
@@ -207,7 +207,7 @@ function CreateProject() {
           <input
             type="date"
             value={projectStatus.endDate}
-            onChange={(e) => dispatchDates({ action: 'changeEnd', payLoad: e.target.value })}
+            onChange={(e) => dispatchStatus({ action: 'changeEnd', payLoad: e.target.value })}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />

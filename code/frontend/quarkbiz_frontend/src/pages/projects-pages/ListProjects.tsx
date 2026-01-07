@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { fetchProjects } from "../../services/ProjectsService";
+import { SearchContext } from "../../App";
 
 type Project = {
   id: number,
@@ -7,23 +8,40 @@ type Project = {
 };
 
 function ListProjects() {
+
+  // states
   const [projects, setProjects] = useState<Project[]>([]);
 
+  // context values
+  const searchValue = useContext(SearchContext); // receives normalized search value
+
+  // use memo to filter projects without unnecessary recalculation
+  const filteredProjects = useMemo(() => {
+    if (!searchValue) return projects;
+
+    return projects.filter(project =>
+      project.projName.toLowerCase().includes(searchValue)
+    );
+  }, [projects, searchValue]);
+
+  // load projects from database
   const loadProjects = async () => {
     const projectsData = await fetchProjects();
     setProjects(projectsData);
   };
 
+  // use effects
   useEffect(() => {
     loadProjects();
   }, []);
 
+  // RETURN ------------------------------------------
   return (
     <div className="p-4 font-sans">
       <h2 className="text-2xl font-bold mb-6">Projects</h2>
 
       <ul className="space-y-3">
-        {projects.map((project, index) => (
+        {filteredProjects.map((project, index) => (
           <li
             key={project.id}
             className="flex items-center space-x-4"
