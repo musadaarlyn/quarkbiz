@@ -17,7 +17,7 @@ function ListProjects() {
 
   // use memo to filter projects without unnecessary recalculation
   const filteredProjects = projects.filter(project =>
-      project.projName.toLowerCase().includes(searchValue)
+      project.projName.toLowerCase().includes(searchValue.trim())
   );
 
   // load projects from database
