@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchTechStacks } from "../../services/TechStackService";
+import React from "react";
 
 type Project = {
   id: number;
@@ -22,7 +23,7 @@ interface Props {
   project?: Project | null;
 }
 
-const ViewProjectCard: React.FC<Props> = ({project}) => {
+const ViewProjectCard: React.FC<Props> = ({project}: Props) => {
 
     if (!project) return null;
 
@@ -39,6 +40,12 @@ const ViewProjectCard: React.FC<Props> = ({project}) => {
     };
 
     // use effects
+
+    // testing if getting rerendered
+    useEffect(() => {
+        console.log("rerendered");
+    })
+
     // fetch tech stacks from database
     useEffect(() => {
         const load = async () => {
@@ -106,4 +113,11 @@ const ViewProjectCard: React.FC<Props> = ({project}) => {
     );
 }
 
-export default ViewProjectCard;
+export default React.memo(ViewProjectCard, (prevProps, nextProps) => {
+
+  if (prevProps.project === nextProps.project) return true;
+  if (!prevProps.project || !nextProps.project) return false;
+  
+  // Compare projects
+  return prevProps.project.id === nextProps.project.id;
+});
