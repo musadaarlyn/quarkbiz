@@ -16,13 +16,9 @@ function ListProjects() {
   const searchValue = useContext(SearchContext); // receives normalized search value
 
   // use memo to filter projects without unnecessary recalculation
-  const filteredProjects = useMemo(() => {
-    if (!searchValue) return projects;
-
-    return projects.filter(project =>
+  const filteredProjects = projects.filter(project =>
       project.projName.toLowerCase().includes(searchValue)
-    );
-  }, [projects, searchValue]);
+  );
 
   // load projects from database
   const loadProjects = async () => {
