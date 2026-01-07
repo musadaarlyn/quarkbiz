@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useReducer } from "react";
 import { fetchTechStacks } from "../../services/TechStackService";
 import { createProject } from "../../services/ProjectsService";
 
@@ -7,13 +7,89 @@ type Tech = {
   tsName: string;
 };
 
+// useReducer for status - dates consistency -------------- <1>
+
+interface ProjectStatusState {
+  status: 'Planning' | 'In Progress' | 'Completed' | 'On Hold';
+  startDate: string;
+  endDate: string;
+  error: string | null;
+}
+
+interface DateAction {
+  actionType: 'changeStart' | 'changeEnd';
+  dateValue: string;
+}
+
+const initialState: ProjectStatusState = {
+    status: 'Planning',
+    startDate: '',
+    endDate: '',
+    error: null
+  };
+
+function statusReducer(state: ProjectStatusState, action: DateAction) {
+
+  const {actionType} = action;
+
+  // date objects for validation
+  const now = new Date();
+  const actionDate = new Date(action.dateValue);
+  const start = new Date(state.startDate);
+  const end = new Date(state.endDate);
+
+  switch(actionType) {
+
+    case 'changeStart': {
+
+      const hasError = end && (actionDate > end);
+
+      const newStatus: ProjectStatusState['status'] = actionDate <= now ? 'In Progress' : 'Planning';
+        return {
+          ...state,
+          startDate: hasError? state.startDate : action.dateValue,
+          status: hasError? state.status : newStatus,
+          error: hasError ? "Start date must be before end date." : null
+        }
+    }
+
+    case 'changeEnd': {
+
+      const hasError = start && (actionDate < start);
+
+      let newStatus: ProjectStatusState['status'] = actionDate <= now ? 'Completed' : 'In Progress';
+
+      if(newStatus==='In Progress') {
+        newStatus = actionDate > now ? 'Planning': 'In Progress';
+      }
+
+      return {
+          ...state,
+          endDate: hasError? '' : action.dateValue,
+          status: hasError? state.status : newStatus,
+          error: hasError ? "Start date must be before end date." : null
+        }
+    }
+
+    default: {
+      return {
+        ...state,
+        error: "Failed to change date."
+      };
+    }
+
+  }
+
+}
+
+// -------------------------------------------------------- </1>
+
 function CreateProject() {
   const [projName, setProjName] = useState("");
   const [projDescription, setDescription] = useState("");
   const [techStackIds, setTechStacks] = useState<number[]>([]);
-  const [status, setStatus] = useState<'Planning' | 'In Progress' | 'Completed' | 'On Hold'>('Planning');
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+
+  const [projectStatus, dispatchDates] = useReducer(statusReducer, initialState);
 
   const [techs, getTechStacks] = useState<Tech[]>([]);
 
@@ -29,19 +105,14 @@ function CreateProject() {
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
 
-    if(startDate > endDate) {
-      alert("Start date must be before end date");
-      return;
-    }
-
     try {
       await createProject({
         projName,
         projDescription,
         techStackIds,
-        status,
-        startDate,
-        endDate
+        status: projectStatus.status,
+        startDate: projectStatus.startDate,
+        endDate: projectStatus.endDate
       });
 
       alert("Project Added");
@@ -55,14 +126,19 @@ function CreateProject() {
     setProjName("");
     setDescription("");
     setTechStacks([]);
-    setStatus("Planning");
-    setStartDate("");
-    setEndDate("");
+    Object.assign(projectStatus, initialState);
   };
 
   return (
     <div className="p-4 font-sans">
       <h2 className="text-2xl font-bold mb-6">Create Project</h2>
+
+       {/* Show error if exists */}
+      {projectStatus.error && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+          {projectStatus.error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
@@ -110,17 +186,7 @@ function CreateProject() {
         {/* Status */}
         <div className="flex flex-col">
           <label className="text-gray-700 font-medium mb-1">Status</label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as 'Planning' | 'In Progress' | 'Completed' | 'On Hold')}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            <option value='Planning'>Planning</option>
-            <option value='In Progress'>In Progress</option>
-            <option value='Completed'>Completed</option>
-            <option value='On Hold'>On Hold</option>
-          </select>
+          <input type="text" value={projectStatus.status} readOnly/>
         </div>
 
         {/* Start Date */}
@@ -128,8 +194,8 @@ function CreateProject() {
           <label className="text-gray-700 font-medium mb-1">Start Date</label>
           <input
             type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            value={projectStatus.startDate}
+            onChange={(e) => dispatchDates({ actionType: 'changeStart', dateValue: e.target.value })}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
@@ -140,8 +206,8 @@ function CreateProject() {
           <label className="text-gray-700 font-medium mb-1">End Date</label>
           <input
             type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            value={projectStatus.endDate}
+            onChange={(e) => dispatchDates({ actionType: 'changeEnd', dateValue: e.target.value })}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
