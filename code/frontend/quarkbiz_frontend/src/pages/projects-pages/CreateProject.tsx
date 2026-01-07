@@ -1,4 +1,4 @@
-import { useEffect, useState, useReducer } from "react";
+import { useEffect, useState, useReducer, useRef } from "react";
 import { fetchTechStacks } from "../../services/TechStackService";
 import { createProject } from "../../services/ProjectsService";
 
@@ -16,10 +16,22 @@ interface ProjectStatusState {
   error: string | null;
 }
 
-interface DateAction {
-  action: 'changeStart' | 'changeEnd';
+interface ChangeStartAction {
+  action: 'changeStart';
   payLoad: string;
 }
+
+interface ChangeEndAction {
+  action: 'changeEnd';
+  payLoad: string;
+}
+
+interface ResetAction {
+  action: 'reset';
+}
+
+type DateAction  = ChangeStartAction | ChangeEndAction | ResetAction;
+
 
 const initialState: ProjectStatusState = {
     status: 'Planning',
@@ -34,7 +46,6 @@ function statusReducer(state: ProjectStatusState, action: DateAction) {
 
   // date objects for validation
   const now = new Date();
-  const actionDate = new Date(action.payLoad);
   const start = new Date(state.startDate);
   const end = new Date(state.endDate);
 
@@ -42,6 +53,7 @@ function statusReducer(state: ProjectStatusState, action: DateAction) {
 
     case 'changeStart': {
 
+      const actionDate = new Date(action.payLoad);
       const hasError = end && (actionDate > end);
 
       const newStatus: ProjectStatusState['status'] = actionDate <= now ? 'In Progress' : 'Planning';
@@ -55,21 +67,25 @@ function statusReducer(state: ProjectStatusState, action: DateAction) {
 
     case 'changeEnd': {
 
+      const actionDate = new Date(action.payLoad);
       const hasError = start && (actionDate < start);
 
       let newStatus: ProjectStatusState['status'] = actionDate <= now ? 'Completed' : 'In Progress';
 
       if(newStatus==='In Progress') {
-        newStatus = actionDate > now ? 'Planning': 'In Progress';
+        newStatus = actionDate < now ? 'Planning': 'In Progress';
       }
 
       return {
           ...state,
-          endDate: hasError? '' : action.payLoad,
+          endDate: hasError? state.endDate : action.payLoad,
           status: hasError? state.status : newStatus,
           error: hasError ? "Start date must be before end date." : null
         }
     }
+
+    case 'reset':
+      return initialState;
 
     default: {
       return {
@@ -85,13 +101,18 @@ function statusReducer(state: ProjectStatusState, action: DateAction) {
 // -------------------------------------------------------- </1>
 
 function CreateProject() {
+
+  // states
   const [projName, setProjName] = useState("");
   const [projDescription, setDescription] = useState("");
   const [techStackIds, setTechStacks] = useState<number[]>([]);
+  const [techs, getTechStacks] = useState<Tech[]>([]);
 
+  // reducers
   const [projectStatus, dispatchStatus] = useReducer(statusReducer, initialState);
 
-  const [techs, getTechStacks] = useState<Tech[]>([]);
+  // refs
+  const errorRef = useRef<HTMLDivElement | null>(null);
 
   const loadStacks = async () => {
     const stacksData = await fetchTechStacks();
@@ -102,6 +123,14 @@ function CreateProject() {
     loadStacks();
   }, []);
 
+  // if the project status reducer sets a new error, show error message again
+  useEffect(() => {
+    if (projectStatus.error && errorRef.current) {
+      errorRef.current.style.display = "flex"; // show again
+    }
+  }, [projectStatus.error]);
+
+  // HANDLE FORM SUBMIT AND RESET FORM ----------------------
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
 
@@ -126,17 +155,27 @@ function CreateProject() {
     setProjName("");
     setDescription("");
     setTechStacks([]);
-    Object.assign(projectStatus, initialState);
+    dispatchStatus({ action: 'reset' });
   };
 
+  // RETURN --------------------------------------------
   return (
     <div className="p-4 font-sans">
       <h2 className="text-2xl font-bold mb-6">Create Project</h2>
 
        {/* Show error if exists */}
       {projectStatus.error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-          {projectStatus.error}
+        <div ref={errorRef} className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+          <span>{projectStatus.error}</span>
+          <button
+            type="button"
+            onClick={() => {
+              if (errorRef.current) {
+                errorRef.current.style.display = "none";
+              }
+            }}
+            className="ml-auto font-bold hover:text-red-900"
+          >X</button>
         </div>
       )}
 

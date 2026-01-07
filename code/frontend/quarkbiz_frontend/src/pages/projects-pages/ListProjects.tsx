@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useMemo } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { fetchProjects } from "../../services/ProjectsService";
 import { SearchContext } from "../../App";
 
@@ -11,6 +11,10 @@ function ListProjects() {
 
   // states
   const [projects, setProjects] = useState<Project[]>([]);
+
+  // refs
+
+  const projRef = useRef(null);
 
   // context values
   const searchValue = useContext(SearchContext); // receives normalized search value
