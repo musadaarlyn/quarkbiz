@@ -17,8 +17,8 @@ interface ProjectStatusState {
 }
 
 interface DateAction {
-  actionType: 'changeStart' | 'changeEnd';
-  dateValue: string;
+  action: 'changeStart' | 'changeEnd';
+  payLoad: string;
 }
 
 const initialState: ProjectStatusState = {
@@ -30,11 +30,11 @@ const initialState: ProjectStatusState = {
 
 function statusReducer(state: ProjectStatusState, action: DateAction) {
 
-  const {actionType} = action;
+  const {action: actionType} = action;
 
   // date objects for validation
   const now = new Date();
-  const actionDate = new Date(action.dateValue);
+  const actionDate = new Date(action.payLoad);
   const start = new Date(state.startDate);
   const end = new Date(state.endDate);
 
@@ -47,7 +47,7 @@ function statusReducer(state: ProjectStatusState, action: DateAction) {
       const newStatus: ProjectStatusState['status'] = actionDate <= now ? 'In Progress' : 'Planning';
         return {
           ...state,
-          startDate: hasError? state.startDate : action.dateValue,
+          startDate: hasError? state.startDate : action.payLoad,
           status: hasError? state.status : newStatus,
           error: hasError ? "Start date must be before end date." : null
         }
@@ -65,7 +65,7 @@ function statusReducer(state: ProjectStatusState, action: DateAction) {
 
       return {
           ...state,
-          endDate: hasError? '' : action.dateValue,
+          endDate: hasError? '' : action.payLoad,
           status: hasError? state.status : newStatus,
           error: hasError ? "Start date must be before end date." : null
         }
@@ -195,7 +195,7 @@ function CreateProject() {
           <input
             type="date"
             value={projectStatus.startDate}
-            onChange={(e) => dispatchDates({ actionType: 'changeStart', dateValue: e.target.value })}
+            onChange={(e) => dispatchDates({ action: 'changeStart', payLoad: e.target.value })}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
@@ -207,7 +207,7 @@ function CreateProject() {
           <input
             type="date"
             value={projectStatus.endDate}
-            onChange={(e) => dispatchDates({ actionType: 'changeEnd', dateValue: e.target.value })}
+            onChange={(e) => dispatchDates({ action: 'changeEnd', payLoad: e.target.value })}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
