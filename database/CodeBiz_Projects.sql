@@ -45,3 +45,31 @@ ALTER TABLE projects
 ADD COLUMN updatedAt TIMESTAMP NULL DEFAULT NULL AFTER createdAt;
 
 DELETE FROM projects;
+
+
+-- MOVING JWT AUTH IMPLEMENTATION ---
+
+-- Users table
+CREATE TABLE users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    displayName VARCHAR(100),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP NULL DEFAULT NULL
+);
+
+-- Add user reference to existing projects table
+ALTER TABLE projects
+ADD COLUMN user_id BIGINT AFTER id,
+ADD CONSTRAINT fk_projects_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+CREATE INDEX idx_projects_user ON projects(user_id);
+
+-- DEFAULT USER OWNS ALL THE EXISTING PROJECTS
+INSERT INTO users (username, password_hash, displayName) 
+VALUES ('default_user', '$2a$10$defaultHashedPassword', 'Default User');
+
+UPDATE projects 
+SET user_id = (SELECT id FROM users WHERE username = 'default_user')
+WHERE user_id IS NULL;
