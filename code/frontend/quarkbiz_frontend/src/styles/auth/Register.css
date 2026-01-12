@@ -38,3 +38,11 @@
 .register-link {
   @apply text-[#05b7f5] hover:underline font-medium;
 }
+
+.auth-logo {
+  @apply w-16 max-w-lg object-contain m-auto;
+}
+
+.register-error {
+  @apply mt-1 text-sm text-red-400;
+}

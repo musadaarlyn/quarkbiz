@@ -22,7 +22,7 @@ public class UsersService {
     // -------------------------------------------------------------------------- >
     public UsersResponseDTO create(UsersRequestDTO dto) {
 
-        // 1Business validation
+        // Business validation
         if (usersDao.existsByUsername(dto.username)) {
             throw new BadRequestException("Username already exists");
         }

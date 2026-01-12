@@ -4,6 +4,7 @@ import { login } from "../../services/auth/AuthService";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import "../../styles/auth/Login.css"
+import logo from "../../assets/img/quarkbiz-logo.png";
 
 
 export default function Login() {
@@ -31,6 +32,8 @@ export default function Login() {
   return (
     <div className="login-page">
       <form onSubmit={handleSubmit} className="login-card">
+        {/* Logo */}
+        <img src={logo} alt="Quarkbiz Logo" className="auth-logo" />
         <h2 className="login-title">Login</h2>
 
         {/* Username */}

@@ -13,7 +13,7 @@ export async function createAccount(payload: {
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Failed to create project' }));
+    const error = await res.json().catch(() => ({ message: 'Failed to create account' }));
     throw new Error(error.message || 'Failed to create project');
   }
   return res.json();
