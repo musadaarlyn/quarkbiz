@@ -5,6 +5,7 @@ import ListProjects from './ListProjects'
 import CreateProject from './CreateProject'
 import { useState, createContext } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import "../../styles/projects/Projects.css";
 
 export const SearchContext = createContext("");
 
@@ -22,36 +23,37 @@ function Projects() {
 
   // RETURN ------------------------------------------------------------
   return (
-    <div className="flex flex-col min-h-screen md:flex-row font-sans">
-      
+    <div className="projects-layout">
       {/* Navigation */}
-      <nav className="bg-[#414547] p-4 md:w-1/6 flex flex-col">
-
+      <nav className="projects-nav">
         {/* Links */}
-        <ul className="flex flex-row md:flex-col gap-3 list-none w-full">
-          <li className="w-full">
+        <ul className="projects-nav-list">
+          <li className="projects-nav-item">
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `block w-full text-center py-2 rounded-md transition-colors ${
+                [
+                  "projects-nav-link",
                   isActive
-                    ? 'bg-[#05b7f5] text-white'
-                    : 'text-gray-300 hover:bg-[#c0c1c2] hover:text-white'
-                }`
+                    ? "projects-nav-link--active"
+                    : "projects-nav-link--inactive",
+                ].join(" ")
               }
             >
               Home
             </NavLink>
           </li>
-          <li className="w-full">
+
+          <li className="projects-nav-item">
             <NavLink
               to="/projects"
               className={({ isActive }) =>
-                `block w-full text-center py-2 rounded-md transition-colors ${
+                [
+                  "projects-nav-link",
                   isActive
-                    ? 'bg-[#05b7f5] text-white'
-                    : 'text-gray-300 hover:bg-[#c0c1c2] hover:text-white'
-                }`
+                    ? "projects-nav-link--active"
+                    : "projects-nav-link--inactive",
+                ].join(" ")
               }
             >
               Projects
@@ -59,22 +61,23 @@ function Projects() {
           </li>
         </ul>
 
-        {/* Search bar (bottom) */}
-        <div className="mt-10 w-full pt-4">
+        {/* Search */}
+        <div className="projects-search">
           <input
             type="text"
             placeholder="Search..."
-            className="w-full px-3 py-2 rounded-md bg-[#2f3234] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#05b7f5]"
-            value={search.trim().toLowerCase()} // normalized
+            value={search.trim().toLowerCase()}
             onChange={(e) => setSearch(e.target.value)}
+            className="projects-search-input"
           />
         </div>
 
-        <div className="mt-auto w-full">
+        {/* Logout */}
+        <div className="projects-logout">
           <button
             type="button"
             onClick={handleLogout}
-            className="block w-full text-center py-2 rounded-md transition-colors text-gray-300 hover:bg-[#c0c1c2] hover:text-white"
+            className="projects-logout-button"
           >
             Logout
           </button>
@@ -82,15 +85,15 @@ function Projects() {
       </nav>
 
       {/* Main Content */}
-      <div className="flex-1 p-4">
+      <div className="projects-content">
         <SearchContext.Provider value={search}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/projects" element={<ManageProjects />}>
-                  <Route path="list-projects" element={<ListProjects />} />
-                  <Route path="create-project" element={<CreateProject />} />
-                </Route>
-              </Routes>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/projects" element={<ManageProjects />}>
+              <Route path="list-projects" element={<ListProjects />} />
+              <Route path="create-project" element={<CreateProject />} />
+            </Route>
+          </Routes>
         </SearchContext.Provider>
       </div>
     </div>

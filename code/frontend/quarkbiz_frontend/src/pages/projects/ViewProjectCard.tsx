@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { fetchTechStacks } from "../../services/projects/TechStackService";
 import React from "react";
+import "../../styles/projects/ViewProjectCard.css";
 
 type Project = {
   id: number;
@@ -63,52 +64,62 @@ const ViewProjectCard: React.FC<Props> = ({project}: Props) => {
 
     // RETURN -------------------------------------
     return(
-        <div className="m-8 flex-1 border border-gray-200 rounded-md shadow-sm p-8">
-            <div className="space-y-3 text-sm">
-                <div>
-                    <p className="text-slate-500 uppercase tracking-wide text-xs">Name</p>
-                    <p className="font-medium">{project.projName}</p>
-                </div>
-
-                <div>
-                    <p className="text-slate-500 uppercase tracking-wide text-xs">Status</p>
-                    <p>{project.status}</p>
-                </div>
-
-                <div>
-                    <p className="text-slate-500 uppercase tracking-wide text-xs">Description</p>
-                    <p>{project.projDescription || "—"}</p>
-                </div>
-
-                <div>
-                    <p className="text-slate-500 uppercase tracking-wide text-xs">Tech Stack</p>
-                    <p>
-                    {project.techStackIds.length > 0 ? getTechStackNames(project.techStackIds).join(", ") : "—"}
-                    </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                    <p className="text-slate-500 uppercase tracking-wide text-xs">Start Date</p>
-                    <p>{project.startDate ? new Date(project.startDate).toLocaleDateString() : "—"}</p>
-                    </div>
-                    <div>
-                    <p className="text-slate-500 uppercase tracking-wide text-xs">End Date</p>
-                    <p>{project.endDate ? new Date(project.endDate).toLocaleDateString() : "—"}</p>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                    <p className="text-slate-500 uppercase tracking-wide text-xs">Created</p>
-                    <p>{project.createdAt ? new Date(project.createdAt).toLocaleString() : "—"}</p>
-                    </div>
-                    <div>
-                    <p className="text-slate-500 uppercase tracking-wide text-xs">Updated</p>
-                    <p>{project.updatedAt ? new Date(project.updatedAt).toLocaleString() : "—"}</p>
-                    </div>
-                </div>
+        <div className="view-project-card">
+        <div className="view-project-card-content">
+            <div className="view-project-card-field">
+            <p className="view-project-card-label">Name</p>
+            <p className="view-project-card-value">{project.projName}</p>
             </div>
+
+            <div className="view-project-card-field">
+            <p className="view-project-card-label">Status</p>
+            <p className="view-project-card-value">{project.status}</p>
+            </div>
+
+            <div className="view-project-card-field">
+            <p className="view-project-card-label">Description</p>
+            <p className="view-project-card-value">{project.projDescription || "—"}</p>
+            </div>
+
+            <div className="view-project-card-field">
+            <p className="view-project-card-label">Tech Stack</p>
+            <p className="view-project-card-value">
+                {project.techStackIds.length > 0
+                ? getTechStackNames(project.techStackIds).join(", ")
+                : "—"}
+            </p>
+            </div>
+
+            <div className="view-project-card-grid">
+            <div>
+                <p className="view-project-card-label">Start Date</p>
+                <p className="view-project-card-value">
+                {project.startDate ? new Date(project.startDate).toLocaleDateString() : "—"}
+                </p>
+            </div>
+            <div>
+                <p className="view-project-card-label">End Date</p>
+                <p className="view-project-card-value">
+                {project.endDate ? new Date(project.endDate).toLocaleDateString() : "—"}
+                </p>
+            </div>
+            </div>
+
+            <div className="view-project-card-grid">
+            <div>
+                <p className="view-project-card-label">Created</p>
+                <p className="view-project-card-value">
+                {project.createdAt ? new Date(project.createdAt).toLocaleString() : "—"}
+                </p>
+            </div>
+            <div>
+                <p className="view-project-card-label">Updated</p>
+                <p className="view-project-card-value">
+                {project.updatedAt ? new Date(project.updatedAt).toLocaleString() : "—"}
+                </p>
+            </div>
+            </div>
+        </div>
         </div>
     );
 }

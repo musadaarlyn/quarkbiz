@@ -1,0 +1,57 @@
+@reference "../../index.css";
+
+.projects-layout {
+  @apply flex flex-col min-h-screen md:flex-row font-sans;
+}
+
+/* Sidebar / Navigation */
+.projects-nav {
+  @apply bg-[#414547] p-4 md:w-1/6 flex flex-col;
+}
+
+.projects-nav-list {
+  @apply flex flex-row md:flex-col gap-3 list-none w-full;
+}
+
+.projects-nav-item {
+  @apply w-full;
+}
+
+/* NavLink states */
+.projects-nav-link {
+  @apply block w-full text-center py-2 rounded-md transition-colors;
+}
+
+.projects-nav-link--active {
+  @apply bg-[#05b7f5] text-white;
+}
+
+.projects-nav-link--inactive {
+  @apply text-gray-300 hover:bg-[#c0c1c2] hover:text-white;
+}
+
+/* Search */
+.projects-search {
+  @apply mt-10 w-full pt-4;
+}
+
+.projects-search-input {
+  @apply w-full px-3 py-2 rounded-md
+         bg-[#2f3234] text-white placeholder-gray-400
+         focus:outline-none focus:ring-2 focus:ring-[#05b7f5];
+}
+
+/* Logout */
+.projects-logout {
+  @apply mt-auto w-full;
+}
+
+.projects-logout-button {
+  @apply block w-full text-center py-2 rounded-md transition-colors
+         text-gray-300 hover:bg-[#c0c1c2] hover:text-white;
+}
+
+/* Main content */
+.projects-content {
+  @apply flex-1 p-4;
+}

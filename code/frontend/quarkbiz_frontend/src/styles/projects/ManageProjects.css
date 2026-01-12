@@ -1,0 +1,22 @@
+@reference "../../index.css";
+
+.manage-projects {
+  @apply p-4 font-sans;
+}
+
+/* Tabs / actions */
+.manage-projects-nav {
+  @apply flex flex-wrap gap-4 mb-6;
+}
+
+.manage-projects-link {
+  @apply px-4 py-2 rounded-md border transition-colors font-medium;
+}
+
+.manage-projects-link--active {
+  @apply bg-[#414547] text-white border-none;
+}
+
+.manage-projects-link--inactive {
+  @apply bg-transparent text-[#414547] border border-[#414547] hover:bg-gray-100;
+}

@@ -1,3 +1,7 @@
+# Tailwind Setup
+
+(https://tailwindcss.com/docs/installation/using-vite)
+
 # Frontend Auth + JWT Handling (QuarkBiz Frontend)
 
 This document explains how the frontend handles authentication using a JWT issued by the backend. It covers:

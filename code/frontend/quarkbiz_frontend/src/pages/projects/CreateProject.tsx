@@ -1,6 +1,7 @@
 import { useEffect, useState, useReducer, useRef } from "react";
 import { fetchTechStacks } from "../../services/projects/TechStackService";
 import { createProject } from "../../services/projects/ProjectsService";
+import "../../styles/projects/CreateProject.css";
 
 type Tech = {
   id: number;
@@ -160,104 +161,107 @@ function CreateProject() {
 
   // RETURN --------------------------------------------
   return (
-    <div className="p-4 font-sans">
-      <h2 className="text-2xl font-bold mb-6">Create Project</h2>
+    <div className="create-project-page">
+      <h2 className="create-project-title">Create Project</h2>
 
-       {/* Show error if exists */}
       {projectStatus.error && (
-        <div ref={errorRef} className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+        <div ref={errorRef} className="create-project-error">
           <span>{projectStatus.error}</span>
           <button
             type="button"
             onClick={() => {
-              if (errorRef.current) {
-                errorRef.current.style.display = "none";
-              }
+              if (errorRef.current) errorRef.current.style.display = "none";
             }}
-            className="ml-auto font-bold hover:text-red-900"
-          >X</button>
+            className="create-project-error-button"
+          >
+            X
+          </button>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
+      <form onSubmit={handleSubmit} className="create-project-form">
         {/* Name */}
-        <div className="flex flex-col">
-          <label className="text-gray-700 font-medium mb-1">Name</label>
+        <div className="create-project-field">
+          <label className="create-project-label">Name</label>
           <input
             type="text"
             value={projName}
             onChange={(e) => setProjName(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="create-project-input"
           />
         </div>
 
         {/* Description */}
-        <div className="flex flex-col">
-          <label className="text-gray-700 font-medium mb-1">Description</label>
+        <div className="create-project-field">
+          <label className="create-project-label">Description</label>
           <textarea
             value={projDescription}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="create-project-textarea"
           />
         </div>
 
         {/* Tech Stack */}
-        <div className="flex flex-col">
-          <label className="text-gray-700 font-medium mb-1">Tech Stack</label>
+        <div className="create-project-field">
+          <label className="create-project-label">Tech Stack</label>
           <select
             multiple
             required
             value={techStackIds.map(String)}
             onChange={(e) => {
-              const values = Array.from(e.target.selectedOptions).map(option => Number(option.value));
+              const values = Array.from(e.target.selectedOptions).map((option) =>
+                Number(option.value)
+              );
               setTechStacks(values);
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="create-project-select"
           >
-            {techs.map(tech => (
-              <option key={tech.id} value={tech.id}>{tech.tsName}</option>
+            {techs.map((tech) => (
+              <option key={tech.id} value={tech.id}>
+                {tech.tsName}
+              </option>
             ))}
           </select>
         </div>
 
         {/* Status */}
-        <div className="flex flex-col">
-          <label className="text-gray-700 font-medium mb-1">Status</label>
-          <input type="text" value={projectStatus.status} readOnly/>
+        <div className="create-project-field">
+          <label className="create-project-label">Status</label>
+          <input type="text" value={projectStatus.status} readOnly className="create-project-input" />
         </div>
 
         {/* Start Date */}
-        <div className="flex flex-col">
-          <label className="text-gray-700 font-medium mb-1">Start Date</label>
+        <div className="create-project-field">
+          <label className="create-project-label">Start Date</label>
           <input
             type="date"
             value={projectStatus.startDate}
-            onChange={(e) => dispatchStatus({ action: 'changeStart', payLoad: e.target.value })}
+            onChange={(e) =>
+              dispatchStatus({ action: "changeStart", payLoad: e.target.value })
+            }
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="create-project-input"
           />
         </div>
 
         {/* End Date */}
-        <div className="flex flex-col">
-          <label className="text-gray-700 font-medium mb-1">End Date</label>
+        <div className="create-project-field">
+          <label className="create-project-label">End Date</label>
           <input
             type="date"
             value={projectStatus.endDate}
-            onChange={(e) => dispatchStatus({ action: 'changeEnd', payLoad: e.target.value })}
+            onChange={(e) =>
+              dispatchStatus({ action: "changeEnd", payLoad: e.target.value })
+            }
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="create-project-input"
           />
         </div>
 
         {/* Submit Button */}
         <div className="md:col-span-2 mt-8">
-          <button
-            type="submit"
-            className="bg-[#414547] text-white px-6 py-2 rounded-md font-medium shadow hover:bg-gray-800 transition-colors w-1/2 mx-auto block"
-          >
+          <button type="submit" className="create-project-submit">
             Create
           </button>
         </div>

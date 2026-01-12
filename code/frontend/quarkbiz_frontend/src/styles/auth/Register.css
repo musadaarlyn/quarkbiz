@@ -1,0 +1,40 @@
+@reference "../../index.css";
+
+.register-page {
+  @apply min-h-screen flex items-center justify-center bg-[#2f3234] font-sans;
+}
+
+.register-card {
+  @apply w-full max-w-md bg-[#414547] p-8 rounded-2xl shadow-lg;
+}
+
+.register-title {
+  @apply text-2xl font-bold text-white text-center mb-6;
+}
+
+.register-field {
+  @apply mb-4;
+}
+
+.register-label {
+  @apply block text-gray-300 mb-1;
+}
+
+.register-input {
+  @apply w-full px-3 py-2 rounded-md
+         bg-[#2f3234] text-white
+         focus:outline-none focus:ring-2 focus:ring-[#05b7f5];
+}
+
+.register-button {
+  @apply w-full bg-[#05b7f5] text-white py-2 rounded-md font-medium
+         hover:bg-[#049fd6] transition-colors;
+}
+
+.register-footer {
+  @apply mt-4 text-center text-gray-300 text-sm;
+}
+
+.register-link {
+  @apply text-[#05b7f5] hover:underline font-medium;
+}

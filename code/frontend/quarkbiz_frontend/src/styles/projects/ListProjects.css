@@ -1,0 +1,36 @@
+@reference "../../index.css";
+
+.list-projects {
+  @apply p-4 font-sans flex flex-col md:flex-row;
+}
+
+/* Sidebar / List */
+.list-projects-sidebar {
+  @apply md:w-1/3;
+}
+
+.list-projects-title {
+  @apply text-2xl font-bold mb-6;
+}
+
+.list-projects-list {
+  @apply space-y-3;
+}
+
+.list-projects-item {
+  @apply flex items-center space-x-4;
+}
+
+.list-projects-number {
+  @apply font-semibold text-gray-700 w-6 text-right;
+}
+
+/* Card */
+.list-projects-card {
+  @apply flex-1 px-4 py-3 bg-white border border-gray-200 rounded-md shadow-sm
+         hover:shadow-md transition-shadow cursor-pointer;
+}
+
+.list-projects-card--selected {
+  @apply ring-2 ring-[#05b7f5] bg-blue-50;
+}

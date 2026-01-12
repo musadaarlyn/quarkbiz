@@ -1,0 +1,45 @@
+@reference "../../index.css";
+
+.create-project-page {
+  @apply p-4 font-sans;
+}
+
+.create-project-title {
+  @apply text-2xl font-bold mb-6;
+}
+
+/* Error message */
+.create-project-error {
+  @apply mb-4 p-3 bg-red-100 text-red-700 rounded-md flex items-center justify-between;
+}
+
+.create-project-error-button {
+  @apply ml-auto font-bold hover:text-red-900 cursor-pointer;
+}
+
+/* Form layout */
+.create-project-form {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-8;
+}
+
+/* Input / textarea / select */
+.create-project-field {
+  @apply flex flex-col;
+}
+
+.create-project-label {
+  @apply text-gray-700 font-medium mb-1;
+}
+
+.create-project-input,
+.create-project-textarea,
+.create-project-select {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md
+         focus:outline-none focus:ring-2 focus:ring-blue-400;
+}
+
+/* Submit Button */
+.create-project-submit {
+  @apply bg-[#414547] text-white px-6 py-2 rounded-md font-medium shadow
+         hover:bg-gray-800 transition-colors w-1/2 mx-auto block;
+}

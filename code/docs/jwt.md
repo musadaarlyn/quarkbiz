@@ -1,3 +1,12 @@
+# Quarkus JWT Setup
+
+https://quarkus.io/guides/security-jwt
+
+**Command for:**
+https://quarkus.io/guides/security-jwt#:~:text=Sample%20JWT%20generation%20output
+
+`.\mvnw --% exec:java -Dexec.mainClass=org.acme.security.jwt.GenerateToken -Dexec.classpathScope=compile -Dsmallrye.jwt.sign.key.location=privateKey.pem`
+
 # JWT Authentication & Authorization (QuarkBiz Backend)
 
 uses **Quarkus 3.x** with **SmallRye JWT** for stateless authentication via signed JWT tokens.

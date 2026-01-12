@@ -1,0 +1,13 @@
+@reference "../../index.css";
+
+.home-page {
+  @apply flex flex-col items-center justify-center h-[95vh] bg-gray-50 p-4 font-sans;
+}
+
+.home-title {
+  @apply text-4xl md:text-5xl font-bold mb-8 text-[#05b7f5];
+}
+
+.home-logo {
+  @apply w-full max-w-lg object-contain;
+}

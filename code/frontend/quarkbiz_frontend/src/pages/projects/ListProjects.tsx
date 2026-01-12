@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { fetchProjects } from "../../services/projects/ProjectsService";
 import { SearchContext } from "./Projects";
 import ViewProjectCard from "./ViewProjectCard";
+import "../../styles/projects/ListProjects.css";
 
 type Project = {
   id: number;
@@ -47,33 +48,33 @@ function ListProjects() {
 
   // RETURN ------------------------------------------
   return (
-    <div className="p-4 font-sans flex flex-col md:flex-row ">
-      <div className="md:w-1/3">
-        <h2 className="text-2xl font-bold mb-6">Projects</h2>
+    <div className="list-projects">
+      <div className="list-projects-sidebar">
+        <h2 className="list-projects-title">Projects</h2>
 
-        <ul className="space-y-3">
+        <ul className="list-projects-list">
           {filteredProjects.map((project, index) => (
-            <li
-              key={project.id}
-              className="flex items-center space-x-4"
-            >
+            <li key={project.id} className="list-projects-item">
               {/* Number */}
-              <span className="font-semibold text-gray-700 w-6 text-right">{index + 1}.</span>
+              <span className="list-projects-number">{index + 1}.</span>
 
               {/* Card */}
-              <div 
+              <div
                 onClick={() => handleProjectClick(project)}
-                className= {
-                  `flex-1 px-4 py-3 bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow
-                   ${selectedProject?.id === project.id ? 'ring-2 ring-[#05b7f5] bg-blue-50' : ''}
-                  `}>
+                className={`list-projects-card ${
+                  selectedProject?.id === project.id
+                    ? "list-projects-card--selected"
+                    : ""
+                }`}
+              >
                 {project.projName}
               </div>
             </li>
           ))}
         </ul>
       </div>
-      <ViewProjectCard project={selectedProject}/>
+
+      <ViewProjectCard project={selectedProject} />
     </div>
   );
 }
