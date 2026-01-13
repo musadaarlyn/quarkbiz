@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
+// 1. What auth data exists
+// 2. What actions are allowed
 interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
@@ -11,13 +13,15 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+
+  // User stays logged in after refresh
   const [token, setToken] = useState<string | null>(
     () => localStorage.getItem("jwtToken")
   );
 
   useEffect(() => {
-    if (token) localStorage.setItem("jwtToken", token);
-    else localStorage.removeItem("jwtToken");
+    if (token) localStorage.setItem("jwtToken", token); // if token is set, save to local storage
+    else localStorage.removeItem("jwtToken"); // if token is destroyed, remove from local storage
   }, [token]);
 
   return (
@@ -25,8 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         token,
         isAuthenticated: !!token,
-        login: setToken,
-        logout: () => setToken(null),
+        login: setToken, // set jwt
+        logout: () => setToken(null), // destryo jwt
       }}
     >
       {children}
@@ -34,8 +38,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// give me the authentication state, and crash loudly if 
+// auth is not set up correctly (if provider doesn't exist)
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
 }

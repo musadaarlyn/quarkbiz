@@ -22,7 +22,6 @@ export default function Login() {
     try {
       const token = await login({ username, password });
       saveToken(token);
-      localStorage.setItem("jwtToken", token);
       navigate("/");
     } catch (err: any) {
       setError(err.message);
