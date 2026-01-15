@@ -14,7 +14,7 @@ function Projects() {
   const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logoutContext: logout } = useAuth();
 
   function handleLogout() {
     logout();

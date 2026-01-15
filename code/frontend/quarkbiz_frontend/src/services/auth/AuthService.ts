@@ -1,7 +1,6 @@
 import { API_BASE_URL } from "../../config/api";
 const base = `${API_BASE_URL}/auth`;
 
-// AuthService.ts
 export async function login(payload: { username: string; password: string }): Promise<string> {
   const res = await fetch(`${base}/login`, {
     method: "POST",

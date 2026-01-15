@@ -35,7 +35,7 @@ public class ProjectsResource {
     public Response create(@Valid ProjectsRequestDTO dto) {
         Object raw = jwt.getClaim("userId");
         if (raw == null) {
-            throw new WebApplicationException("Missing userId claim", Response.Status.UNAUTHORIZED);
+            throw new WebApplicationException("Missing  userId claim", Response.Status.UNAUTHORIZED);
         }
         Long currentUserId = (raw instanceof Number) ? ((Number) raw).longValue() : Long.parseLong(raw.toString());
         ProjectsResponseDTO created = service.create(dto, currentUserId);

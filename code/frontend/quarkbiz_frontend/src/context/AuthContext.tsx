@@ -6,8 +6,8 @@ import type { ReactNode } from "react";
 interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
-  login: (token: string) => void;
-  logout: () => void;
+  loginContext: (token: string) => void;
+  logoutContext: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,6 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => localStorage.getItem("jwtToken")
   );
 
+  // Whenever auth state changes, persist it
   useEffect(() => {
     if (token) localStorage.setItem("jwtToken", token); // if token is set, save to local storage
     else localStorage.removeItem("jwtToken"); // if token is destroyed, remove from local storage
@@ -29,8 +30,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         token,
         isAuthenticated: !!token,
-        login: setToken, // set jwt
-        logout: () => setToken(null), // destryo jwt
+        loginContext: setToken, // set jwt
+        logoutContext: () => setToken(null), // destryo jwt
       }}
     >
       {children}

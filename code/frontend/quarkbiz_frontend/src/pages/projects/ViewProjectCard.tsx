@@ -41,7 +41,6 @@ const ViewProjectCard: React.FC<Props> = ({project}: Props) => {
     };
 
     // use effects
-
     // testing if getting rerendered
     useEffect(() => {
         console.log("rerendered");
@@ -126,9 +125,12 @@ const ViewProjectCard: React.FC<Props> = ({project}: Props) => {
 
 export default React.memo(ViewProjectCard, (prevProps, nextProps) => {
 
-  if (prevProps.project === nextProps.project) return true;
-  if (!prevProps.project || !nextProps.project) return false;
+  let isTheSame = false;
+
+  if (prevProps.project === nextProps.project) {
+    isTheSame = true;
+  }
+    
+  return isTheSame;
   
-  // Compare projects
-  return prevProps.project.id === nextProps.project.id;
 });

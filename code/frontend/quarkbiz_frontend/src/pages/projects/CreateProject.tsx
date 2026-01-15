@@ -18,17 +18,17 @@ interface ProjectStatusState {
 }
 
 interface ChangeStartAction {
-  action: 'changeStart';
+  type: 'changeStart';
   payLoad: string;
 }
 
 interface ChangeEndAction {
-  action: 'changeEnd';
+  type: 'changeEnd';
   payLoad: string;
 }
 
 interface ResetAction {
-  action: 'reset';
+  type: 'reset';
 }
 
 type DateAction  = ChangeStartAction | ChangeEndAction | ResetAction;
@@ -43,7 +43,7 @@ const initialState: ProjectStatusState = {
 
 function statusReducer(state: ProjectStatusState, action: DateAction) {
 
-  const {action: actionType} = action;
+  const {type: actionType} = action;
 
   // date objects for validation
   const now = new Date();
@@ -74,7 +74,7 @@ function statusReducer(state: ProjectStatusState, action: DateAction) {
       let newStatus: ProjectStatusState['status'] = actionDate <= now ? 'Completed' : 'In Progress';
 
       if(newStatus==='In Progress') {
-        newStatus = actionDate < now ? 'Planning': 'In Progress';
+        newStatus = start <= now ? 'In Progress' : 'Planning';
       }
 
       return {
@@ -156,7 +156,7 @@ function CreateProject() {
     setProjName("");
     setDescription("");
     setTechStacks([]);
-    dispatchStatus({ action: 'reset' });
+    dispatchStatus({ type: 'reset' });
   };
 
   // RETURN --------------------------------------------
@@ -238,7 +238,7 @@ function CreateProject() {
             type="date"
             value={projectStatus.startDate}
             onChange={(e) =>
-              dispatchStatus({ action: "changeStart", payLoad: e.target.value })
+              dispatchStatus({ type: "changeStart", payLoad: e.target.value })
             }
             required
             className="create-project-input"
@@ -252,7 +252,7 @@ function CreateProject() {
             type="date"
             value={projectStatus.endDate}
             onChange={(e) =>
-              dispatchStatus({ action: "changeEnd", payLoad: e.target.value })
+              dispatchStatus({ type: "changeEnd", payLoad: e.target.value })
             }
             required
             className="create-project-input"

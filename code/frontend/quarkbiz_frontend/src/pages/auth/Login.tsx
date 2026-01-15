@@ -8,7 +8,7 @@ import logo from "../../assets/img/quarkbiz-logo.png";
 
 
 export default function Login() {
-  const { login: saveToken } = useAuth();
+  const { loginContext: saveToken } = useAuth();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");

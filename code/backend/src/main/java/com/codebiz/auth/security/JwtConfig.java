@@ -14,8 +14,8 @@ public class JwtConfig {
 
     public String generateToken(Long userId, String username, Set<String> roles) {
         return Jwt.issuer(issuer)
-                .upn(username)
-                .claim("userId", userId)
+                .upn(username) // user principal name
+                .claim("userId", userId) // custom claim
                 .groups(roles)
                 .expiresIn(Duration.ofHours(2))
                 .sign();
