@@ -1,8 +1,8 @@
 import { NavLink, Routes, Route, useNavigate } from 'react-router-dom'
-import Home from './Home'
-import ManageProjects from './ManageProjects'
-import ListProjects from './ListProjects'
-import CreateProject from './CreateProject'
+import Home from './project-views/Home'
+import ManageProjects from './project-views/ManageProjects'
+import ListProjects from './project-crud/ListProjects'
+import CreateProject from './project-crud/CreateProject'
 import { useState, createContext } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import "../../styles/projects/Projects.css";

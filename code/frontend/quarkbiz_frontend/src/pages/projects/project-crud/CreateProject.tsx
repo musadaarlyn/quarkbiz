@@ -1,6 +1,6 @@
 import { useEffect, useState, useReducer, useRef } from "react";
-import { fetchTechStacks } from "../../services/projects/TechStackService";
-import { createProject } from "../../services/projects/ProjectsService";
+import { fetchTechStacks } from "../../../services/projects/TechStackService";
+import { createProject } from "../../../services/projects/ProjectsService";
 import "../../styles/projects/CreateProject.css";
 
 type Tech = {
