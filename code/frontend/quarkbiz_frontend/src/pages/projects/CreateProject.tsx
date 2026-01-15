@@ -104,9 +104,6 @@ function statusReducer(state: ProjectStatusState, action: DateAction) {
 function CreateProject() {
 
   // states
-  const [projName, setProjName] = useState("");
-  const [projDescription, setDescription] = useState("");
-  const [techStackIds, setTechStacks] = useState<number[]>([]);
   const [techs, getTechStacks] = useState<Tech[]>([]);
 
   // reducers
@@ -114,6 +111,9 @@ function CreateProject() {
 
   // refs
   const errorRef = useRef<HTMLDivElement | null>(null);
+  const projNameRef = useRef<HTMLInputElement>(null);
+  const projDescriptionRef = useRef<HTMLTextAreaElement>(null);
+  const techStackIdsRef = useRef<HTMLSelectElement>(null);
 
   const loadStacks = async () => {
     const stacksData = await fetchTechStacks();
@@ -135,6 +135,14 @@ function CreateProject() {
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
 
+    const projName = projNameRef.current?.value.trim() ?? "Unnamed Project";
+    const projDescription = projDescriptionRef.current?.value.trim();
+
+    const techStackIds = Array.from(
+      techStackIdsRef.current?.selectedOptions ?? []
+    ).map(option => Number(option.value));
+
+
     try {
       await createProject({
         projName,
@@ -153,10 +161,29 @@ function CreateProject() {
   };
 
   const resetForm = () => {
-    setProjName("");
-    setDescription("");
-    setTechStacks([]);
+    // reset text inputs
+    if (projNameRef.current) {
+      projNameRef.current.value = "";
+    }
+
+    if (projDescriptionRef.current) {
+      projDescriptionRef.current.value = "";
+    }
+
+    // reset multi-select
+    if (techStackIdsRef.current) {
+      Array.from(techStackIdsRef.current.options).forEach(
+        option => (option.selected = false)
+      );
+    }
+    
+    // reset project status reducer
     dispatchStatus({ type: 'reset' });
+
+    // hide error if visible
+    if (errorRef.current) {
+      errorRef.current.style.display = "none";
+    }
   };
 
   // RETURN --------------------------------------------
@@ -185,8 +212,7 @@ function CreateProject() {
           <label className="create-project-label">Name</label>
           <input
             type="text"
-            value={projName}
-            onChange={(e) => setProjName(e.target.value)}
+            ref={projNameRef}
             required
             className="create-project-input"
           />
@@ -196,8 +222,7 @@ function CreateProject() {
         <div className="create-project-field">
           <label className="create-project-label">Description</label>
           <textarea
-            value={projDescription}
-            onChange={(e) => setDescription(e.target.value)}
+            ref={projDescriptionRef}
             className="create-project-textarea"
           />
         </div>
@@ -208,13 +233,7 @@ function CreateProject() {
           <select
             multiple
             required
-            value={techStackIds.map(String)}
-            onChange={(e) => {
-              const values = Array.from(e.target.selectedOptions).map((option) =>
-                Number(option.value)
-              );
-              setTechStacks(values);
-            }}
+            ref={techStackIdsRef}
             className="create-project-select"
           >
             {techs.map((tech) => (
