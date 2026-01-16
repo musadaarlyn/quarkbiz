@@ -1,61 +1,41 @@
-import { useState } from "react";
+import { useRef, useActionState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { createAccount } from "../../services/accounts/AccountService";
 import "../../styles/auth/register.css";
 import logo from "../../assets/img/quarkbiz-logo.png";
+import type { RegisterAccountActionState } from "../../types/state-types/RegisterAccountActionState";
+import { RegisterAccountAction } from "../../actions/forms/auth/RegisterAccountAction";
+
+// ---------------------------- ACTION STATE --------------
+
+const initialActionState: RegisterAccountActionState = {
+  success: false,
+};
+// -------------------------------------------------------- 
 
 export default function Register() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    username: "",
-    password: "",
-    confirmPassword: "",
-    displayName: "",
-  });
+    // action states
+    const [state, formAction, isPending] = useActionState(
+      RegisterAccountAction,
+      initialActionState
+    );
 
-  const [errors, setErrors] = useState<{
-    username?: string;
-    password?: string;
-    confirmPassword?: string;
-    displayName?: string;
-  }>({});
+   // refs
+   const formRef = useRef<HTMLFormElement>(null);
 
-  function validate() {
-    const newErrors: typeof errors = {};
-
-    if (form.username.length < 6 || form.username.length > 60) {
-      newErrors.username = "Username must be 6–60 characters";
-    }
-
-    if (form.password.length < 6 || form.password.length > 60) {
-      newErrors.password = "Password must be 6–60 characters";
-    }
-
-    if (form.password !== form.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    if (form.displayName.length < 2 || form.displayName.length > 60) {
-      newErrors.displayName = "Display name must be 2–60 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!validate()) return;
-
-    await createAccount(form);
-    navigate("/login");
-  }
+   // Reset form after successful submit
+    useEffect(() => {
+      if (state.success) {
+        formRef.current?.reset();
+        alert("Account created");
+        navigate("/login");
+      }
+    }, [state.success]);
 
   return (
     <div className="register-page">
-      <form onSubmit={handleSubmit} className="register-card">
+      <form ref={formRef} action={formAction} className="register-card">
         {/* Logo */}
         <img src={logo} alt="Quarkbiz Logo" className="auth-logo" />
         <h2 className="register-title">Create Account</h2>
@@ -65,15 +45,13 @@ export default function Register() {
           <label className="register-label">Username</label>
           <input
             type="text"
+            name="username"
             required
-            onChange={(e) =>
-              setForm({ ...form, username: e.target.value })
-            }
             className="register-input"
           />
           {/* Error message if username is invalid */}
-          {errors.username && (
-            <p className="register-error">{errors.username}</p>
+          {state.fieldErrors?.username && (
+            <p className="register-error">{state.fieldErrors.username}</p>
           )}
         </div>
 
@@ -83,14 +61,12 @@ export default function Register() {
           <input
             type="password"
             required
-            onChange={(e) =>
-              setForm({ ...form, password: e.target.value })
-            }
+            name="password"
             className="register-input"
           />
           {/* Error message if password is invalid */}
-          {errors.password && (
-            <p className="register-error">{errors.password}</p>
+          {state.fieldErrors?.password && (
+            <p className="register-error">{state.fieldErrors.password}</p>
           )}
         </div>
 
@@ -100,13 +76,11 @@ export default function Register() {
           <input
             type="password"
             required
+            name="confirm-password"
             className="register-input"
-            onChange={(e) =>
-              setForm({ ...form, confirmPassword: e.target.value })
-            }
           />
-          {errors.confirmPassword && (
-            <p className="register-error">{errors.confirmPassword}</p>
+          {state.fieldErrors?.confirmPassword && (
+            <p className="register-error">{state.fieldErrors.confirmPassword}</p>
           )}
         </div>
 
@@ -116,20 +90,18 @@ export default function Register() {
           <input
             type="text"
             required
-            onChange={(e) =>
-              setForm({ ...form, displayName: e.target.value })
-            }
+            name="display-name"
             className="register-input"
           />
           {/* Error message if display name is invalid */}
-          {errors.displayName && (
-            <p className="register-error">{errors.displayName}</p>
+          {state.fieldErrors?.displayName && (
+            <p className="register-error">{state.fieldErrors?.displayName}</p>
           )}
         </div>
 
         {/* Submit */}
-        <button type="submit" className="register-button">
-          Register
+        <button type="submit" disabled={isPending} className="register-button">
+          {isPending ? "Creating account..." : "Register"}
         </button>
 
         {/* Back to login */}

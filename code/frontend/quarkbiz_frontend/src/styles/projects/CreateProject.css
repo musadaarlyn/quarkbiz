@@ -9,8 +9,8 @@
 }
 
 /* Error message */
-.create-project-error {
-  @apply mb-4 p-3 bg-red-100 text-red-700 rounded-md flex items-center justify-between;
+.form-error {
+  @apply text-red-700;
 }
 
 .create-project-error-button {

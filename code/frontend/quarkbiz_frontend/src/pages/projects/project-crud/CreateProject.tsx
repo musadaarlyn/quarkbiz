@@ -1,105 +1,18 @@
-import { useEffect, useState, useReducer, useRef } from "react";
+import { useEffect, useState, useReducer, useRef, useActionState } from "react";
 import { fetchTechStacks } from "../../../services/projects/TechStackService";
-import { createProject } from "../../../services/projects/ProjectsService";
-import "../../styles/projects/CreateProject.css";
+import { CreateProjectAction } from "../../../actions/forms/projects/CreateProjectAction";
+import "../../../styles/projects/CreateProject.css"
+import type { CreateProjectActionState } from "../../../types/state-types/CreateProjectActionState";
+import type { Tech } from "../../../types/entity-types/Tech";
+import { initialState } from "../../../types/state-types/ProjectStatusState";
+import { StatusReducer } from "../../../reducer-functions/StatusReducer";
 
-type Tech = {
-  id: number;
-  tsName: string;
+// ---------------------------- ACTION STATE --------------
+
+const initialActionState: CreateProjectActionState = {
+  success: false,
 };
-
-// useReducer for status - dates consistency -------------- <1>
-
-interface ProjectStatusState {
-  status: 'Planning' | 'In Progress' | 'Completed' | 'On Hold';
-  startDate: string;
-  endDate: string;
-  error: string | null;
-}
-
-interface ChangeStartAction {
-  type: 'changeStart';
-  payLoad: string;
-}
-
-interface ChangeEndAction {
-  type: 'changeEnd';
-  payLoad: string;
-}
-
-interface ResetAction {
-  type: 'reset';
-}
-
-type DateAction  = ChangeStartAction | ChangeEndAction | ResetAction;
-
-
-const initialState: ProjectStatusState = {
-    status: 'Planning',
-    startDate: '',
-    endDate: '',
-    error: null
-  };
-
-function statusReducer(state: ProjectStatusState, action: DateAction) {
-
-  const {type: actionType} = action;
-
-  // date objects for validation
-  const now = new Date();
-  const start = new Date(state.startDate);
-  const end = new Date(state.endDate);
-
-  switch(actionType) {
-
-    case 'changeStart': {
-
-      const actionDate = new Date(action.payLoad);
-      const hasError = end && (actionDate > end);
-
-      const newStatus: ProjectStatusState['status'] = actionDate <= now ? 'In Progress' : 'Planning';
-        return {
-          ...state,
-          startDate: hasError? state.startDate : action.payLoad,
-          status: hasError? state.status : newStatus,
-          error: hasError ? "Start date must be before end date." : null
-        }
-    }
-
-    case 'changeEnd': {
-
-      const actionDate = new Date(action.payLoad);
-      const hasError = start && (actionDate < start);
-
-      let newStatus: ProjectStatusState['status'] = actionDate <= now ? 'Completed' : 'In Progress';
-
-      if(newStatus==='In Progress') {
-        newStatus = start <= now ? 'In Progress' : 'Planning';
-      }
-
-      return {
-          ...state,
-          endDate: hasError? state.endDate : action.payLoad,
-          status: hasError? state.status : newStatus,
-          error: hasError ? "Start date must be before end date." : null
-        }
-    }
-
-    case 'reset':
-      return initialState;
-
-    default: {
-      return {
-        ...state,
-        error: "Failed to change date."
-      };
-    }
-
-  }
-
-}
-
-// -------------------------------------------------------- </1>
+// -------------------------------------------------------- 
 
 function CreateProject() {
 
@@ -107,14 +20,18 @@ function CreateProject() {
   const [techs, getTechStacks] = useState<Tech[]>([]);
 
   // reducers
-  const [projectStatus, dispatchStatus] = useReducer(statusReducer, initialState);
+  const [projectStatus, dispatchStatus] = useReducer(StatusReducer, initialState);
+
+  // action states
+  const [state, formAction, isPending] = useActionState(
+    CreateProjectAction,
+    initialActionState
+  );
 
   // refs
-  const errorRef = useRef<HTMLDivElement | null>(null);
-  const projNameRef = useRef<HTMLInputElement>(null);
-  const projDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const techStackIdsRef = useRef<HTMLSelectElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
+  // load tech stacks
   const loadStacks = async () => {
     const stacksData = await fetchTechStacks();
     getTechStacks(stacksData);
@@ -124,107 +41,47 @@ function CreateProject() {
     loadStacks();
   }, []);
 
-  // if the project status reducer sets a new error, show error message again
+  // Reset form after successful submit
   useEffect(() => {
-    if (projectStatus.error && errorRef.current) {
-      errorRef.current.style.display = "flex"; // show again
-    }
-  }, [projectStatus.error]);
-
-  // HANDLE FORM SUBMIT AND RESET FORM ----------------------
-  const handleSubmit = async(e: React.FormEvent) => {
-    e.preventDefault();
-
-    const projName = projNameRef.current?.value.trim() ?? "Unnamed Project";
-    const projDescription = projDescriptionRef.current?.value.trim();
-
-    const techStackIds = Array.from(
-      techStackIdsRef.current?.selectedOptions ?? []
-    ).map(option => Number(option.value));
-
-
-    try {
-      await createProject({
-        projName,
-        projDescription,
-        techStackIds,
-        status: projectStatus.status,
-        startDate: projectStatus.startDate,
-        endDate: projectStatus.endDate
-      });
-
+    if (state.success) {
+      formRef.current?.reset();
+      dispatchStatus({ type: "reset" });
       alert("Project Added");
-      resetForm();
-    } catch (err: any) {
-      alert(err.message);
     }
-  };
-
-  const resetForm = () => {
-    // reset text inputs
-    if (projNameRef.current) {
-      projNameRef.current.value = "";
-    }
-
-    if (projDescriptionRef.current) {
-      projDescriptionRef.current.value = "";
-    }
-
-    // reset multi-select
-    if (techStackIdsRef.current) {
-      Array.from(techStackIdsRef.current.options).forEach(
-        option => (option.selected = false)
-      );
-    }
-    
-    // reset project status reducer
-    dispatchStatus({ type: 'reset' });
-
-    // hide error if visible
-    if (errorRef.current) {
-      errorRef.current.style.display = "none";
-    }
-  };
+  }, [state.success]);
 
   // RETURN --------------------------------------------
   return (
     <div className="create-project-page">
       <h2 className="create-project-title">Create Project</h2>
 
-      {projectStatus.error && (
-        <div ref={errorRef} className="create-project-error">
-          <span>{projectStatus.error}</span>
-          <button
-            type="button"
-            onClick={() => {
-              if (errorRef.current) errorRef.current.style.display = "none";
-            }}
-            className="create-project-error-button"
-          >
-            X
-          </button>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="create-project-form">
+      <form ref={formRef} action={formAction} className="create-project-form">
         {/* Name */}
         <div className="create-project-field">
           <label className="create-project-label">Name</label>
           <input
             type="text"
-            ref={projNameRef}
+            name="projName"
             required
             className="create-project-input"
           />
+          {state.fieldErrors?.projName && (
+            <span className="form-error">{state.fieldErrors.projName}</span>
+          )}
         </div>
 
         {/* Description */}
         <div className="create-project-field">
           <label className="create-project-label">Description</label>
           <textarea
-            ref={projDescriptionRef}
+            name="projDescription"
             className="create-project-textarea"
           />
+          {state.fieldErrors?.projDescription && (
+            <span className="form-error">
+              {state.fieldErrors.projDescription}
+            </span>
+          )}
         </div>
 
         {/* Tech Stack */}
@@ -233,7 +90,7 @@ function CreateProject() {
           <select
             multiple
             required
-            ref={techStackIdsRef}
+            name="techStackIds"
             className="create-project-select"
           >
             {techs.map((tech) => (
@@ -242,12 +99,27 @@ function CreateProject() {
               </option>
             ))}
           </select>
+          {state.fieldErrors?.techStackIds && (
+            <span className="form-error">
+              {state.fieldErrors.techStackIds}
+            </span>
+          )}
         </div>
 
         {/* Status */}
         <div className="create-project-field">
           <label className="create-project-label">Status</label>
-          <input type="text" value={projectStatus.status} readOnly className="create-project-input" />
+          <input 
+            type="text" 
+            value={projectStatus.status} 
+            readOnly 
+            className="create-project-input" 
+          />
+          <input
+            type="hidden"
+            name="status"
+            value={projectStatus.status}
+          />
         </div>
 
         {/* Start Date */}
@@ -255,6 +127,7 @@ function CreateProject() {
           <label className="create-project-label">Start Date</label>
           <input
             type="date"
+            name="startDate"
             value={projectStatus.startDate}
             onChange={(e) =>
               dispatchStatus({ type: "changeStart", payLoad: e.target.value })
@@ -262,6 +135,11 @@ function CreateProject() {
             required
             className="create-project-input"
           />
+          {state.fieldErrors?.startDate && (
+            <span className="form-error">
+              {state.fieldErrors.startDate}
+            </span>
+          )}
         </div>
 
         {/* End Date */}
@@ -269,6 +147,7 @@ function CreateProject() {
           <label className="create-project-label">End Date</label>
           <input
             type="date"
+            name="endDate"
             value={projectStatus.endDate}
             onChange={(e) =>
               dispatchStatus({ type: "changeEnd", payLoad: e.target.value })
@@ -276,12 +155,17 @@ function CreateProject() {
             required
             className="create-project-input"
           />
+          {state.fieldErrors?.endDate && (
+            <span className="form-error">
+              {state.fieldErrors.endDate}
+            </span>
+          )}
         </div>
 
         {/* Submit Button */}
         <div className="md:col-span-2 mt-8">
-          <button type="submit" className="create-project-submit">
-            Create
+          <button type="submit" disabled={isPending} className="create-project-submit">
+            {isPending ? "Creating..." : "Create"}
           </button>
         </div>
       </form>

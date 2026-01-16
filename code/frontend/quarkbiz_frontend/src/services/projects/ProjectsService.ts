@@ -23,7 +23,7 @@ export async function createProject(payload: {
   projName: string; 
   projDescription?: string;
   techStackIds: number[];
-  status: 'Planning' | 'In Progress' | 'Completed' | 'On Hold';
+  status: string;
   startDate?: string; // yyyy-MM-dd
   endDate?: string;
 }) {

@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
-import "../../styles/projects/ManageProjects.css";
+import "../../../styles/projects/ManageProjects.css";
 
 function ManageProjects() {
   return (

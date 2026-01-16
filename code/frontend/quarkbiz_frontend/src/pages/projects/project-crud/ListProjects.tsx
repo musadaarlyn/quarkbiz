@@ -1,20 +1,9 @@
 import { useEffect, useState, useContext } from "react";
-import { fetchProjects } from "../../services/projects/ProjectsService";
-import { SearchContext } from "./Projects";
-import ViewProjectCard from "./ViewProjectCard";
-import "../../styles/projects/ListProjects.css";
-
-type Project = {
-  id: number;
-  projName: string;
-  projDescription?: string | null;
-  techStackIds: number[];
-  status: 'Planning' | 'In Progress' | 'Completed' | 'On Hold';
-  startDate?: string | null;
-  endDate?: string | null;
-  createdAt: string;
-  updatedAt?: string | null;
-};
+import { fetchProjects } from "../../../services/projects/ProjectsService";
+import { SearchContext } from "../Projects";
+import ViewProjectCard from "./project-cards/ViewProjectCard";
+import "../.././../styles/projects/ListProjects.css";
+import type { Project } from "../../../types/entity-types/Project";
 
 function ListProjects() {
 

@@ -1,19 +1,8 @@
 import { useState, useEffect } from "react";
-import { fetchTechStacks } from "../../services/projects/TechStackService";
+import { fetchTechStacks } from "../../../../services/projects/TechStackService";
 import React from "react";
-import "../../styles/projects/ViewProjectCard.css";
-
-type Project = {
-  id: number;
-  projName: string;
-  projDescription?: string | null;
-  techStackIds: number[];
-  status: 'Planning' | 'In Progress' | 'Completed' | 'On Hold';
-  startDate?: string | null;
-  endDate?: string | null;
-  createdAt: string;
-  updatedAt?: string | null;
-};
+import "../../../../styles/projects/ViewProjectCard.css";
+import type { Project } from "../../../../types/entity-types/Project";
 
 type TechStack = {
   id: number;

@@ -1,5 +1,5 @@
-import logo from "../../assets/img/quarkbiz-logo.png";
-import "../../styles/projects/Home.css";
+import logo from "../../../assets/img/quarkbiz-logo.png";
+import "../../../styles/projects/Home.css";
 
 function Home() {
   return (
