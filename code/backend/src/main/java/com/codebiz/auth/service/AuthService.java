@@ -1,10 +1,7 @@
 package com.codebiz.auth.service;
 
-import java.util.Set;
-
 import com.codebiz.accounts.dao.UsersDao;
 import com.codebiz.accounts.model.users.User;
-import com.codebiz.auth.security.JwtConfig;
 
 import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -18,12 +15,9 @@ public class AuthService {
     @Inject
     UsersDao usersDao;
 
-    @Inject
-    JwtConfig jwtConfig;
-
     // LOGIN
     // -------------------------------------------------------------------------- >
-    public String login(String username, String password) {
+    public User login(String username, String password) {
 
         User user = usersDao.findByUsername(username);
 
@@ -33,10 +27,6 @@ public class AuthService {
                     Response.Status.UNAUTHORIZED);
         }
 
-        // roles are hardcoded for now, can be DB-driven later
-        return jwtConfig.generateToken(
-                user.id,
-                user.username,
-                Set.of("User"));
+        return user;
     }
 }

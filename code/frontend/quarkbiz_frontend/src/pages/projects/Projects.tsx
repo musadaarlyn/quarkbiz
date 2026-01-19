@@ -6,6 +6,7 @@ import CreateProject from './project-crud/CreateProject'
 import { useState, createContext } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import "../../styles/projects/Projects.css";
+import MyList from '../../testing/UseOptimisticHook'
 
 export const SearchContext = createContext("");
 
@@ -93,6 +94,13 @@ function Projects() {
               <Route path="list-projects" element={<ListProjects />} />
               <Route path="create-project" element={<CreateProject />} />
             </Route>
+
+          {/* testing, no links in UI*/}
+          <Route path="/" element={<Home />} />
+            <Route path="/testing" element={<ManageProjects />}>
+              <Route path="use-optimistic" element={<MyList />} />
+            </Route>
+
           </Routes>
         </SearchContext.Provider>
       </div>

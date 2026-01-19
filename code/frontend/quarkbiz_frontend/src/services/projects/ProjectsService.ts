@@ -20,13 +20,13 @@ export async function fetchProjects() {
 
 // CREATE PROJECT
 export async function createProject(payload: {
-  projName: string; 
-  projDescription?: string;
-  techStackIds: number[];
-  status: string;
-  startDate?: string; // yyyy-MM-dd
-  endDate?: string;
-}) {
+    projName: string; 
+    projDescription?: string;
+    techStackIds: number[];
+    status: string;
+    startDate?: string; // yyyy-MM-dd
+    endDate?: string;
+  }) {
   // IMPORTANT: Send status exactly as database ENUM expects
   const res = await fetch(`${base}/create`, {
     method: 'POST',
