@@ -17,7 +17,7 @@ public class JwtConfig {
                 .upn(username) // user principal name
                 .claim("userId", userId) // custom claim
                 .groups(roles)
-                .expiresIn(Duration.ofHours(2))
+                .expiresIn(Duration.ofMinutes(15))
                 .sign();
     }
 }
