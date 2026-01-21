@@ -45,6 +45,13 @@ public class UsersService {
         return toResponseDTO(user);
     }
 
+    public User findById(Long userId) {
+
+        User user = usersDao.findById(userId);
+
+        return user;
+    }
+
     // MAPPER
     // -------------------------------------------------------------------------- >
     private UsersResponseDTO toResponseDTO(User user) {

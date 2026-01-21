@@ -5,6 +5,7 @@ export async function login(payload: { username: string; password: string }): Pr
   const res = await fetch(`${base}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -14,6 +15,21 @@ export async function login(payload: { username: string; password: string }): Pr
   }
 
   const data = await res.json();
-  return data.token;
+  return data.accessToken;
 }
+
+export async function refresh(): Promise<string> {
+  const res = await fetch(`${base}/refresh`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Refresh failed");
+  }
+
+  const data = await res.json();
+  return data.accessToken;
+}
+
 

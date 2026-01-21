@@ -20,4 +20,8 @@ public class JwtConfig {
                 .expiresIn(Duration.ofMinutes(15))
                 .sign();
     }
+
+    public String getIssuer() {
+        return issuer;
+    }
 }

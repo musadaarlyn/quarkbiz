@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { refresh } from "../services/auth/AuthService";
 
 // 1. What auth data exists
 // 2. What actions are allowed
@@ -8,6 +9,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loginContext: (token: string) => void;
   logoutContext: () => void;
+  loading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,15 +17,24 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
 
   // User stays logged in after refresh
-  const [token, setToken] = useState<string | null>(
-    () => localStorage.getItem("jwtToken")
-  );
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Whenever auth state changes, persist it
   useEffect(() => {
-    if (token) localStorage.setItem("jwtToken", token); // if token is set, save to local storage
-    else localStorage.removeItem("jwtToken"); // if token is destroyed, remove from local storage
-  }, [token]);
+    const initAuth = async () => {
+      try {
+        const newToken = await refresh();
+        setToken(newToken);
+        console.log("refreshed");
+      } catch {
+        setToken(null);
+      } finally {
+        setLoading(false); // mark auth as initialized
+      }
+    };
+
+    initAuth();
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -32,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!token,
         loginContext: setToken, // set jwt
         logoutContext: () => setToken(null), // destryo jwt
+        loading
       }}
     >
       {children}

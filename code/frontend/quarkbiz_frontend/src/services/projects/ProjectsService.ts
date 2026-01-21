@@ -2,8 +2,7 @@ import { API_BASE_URL } from "../../config/api";
 const base = `${API_BASE_URL}/projects`;
 
 // AUTH HEADERS
-function authHeaders() {
-  const token = localStorage.getItem("jwtToken");
+function authHeaders(token: string | null) {
   return {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
@@ -11,8 +10,8 @@ function authHeaders() {
 }
 
 // FETCH PROJECTS
-export async function fetchProjects() {
-  const res = await fetch(`${base}/me`, { headers: authHeaders() });
+export async function fetchProjects(token: string | null) {
+  const res = await fetch(`${base}/me`, { headers: authHeaders(token) });
   if (!res.ok) throw new Error('Failed to load projects');
   const data = await res.json();
   return data;
@@ -26,11 +25,12 @@ export async function createProject(payload: {
     status: string;
     startDate?: string; // yyyy-MM-dd
     endDate?: string;
-  }) {
+  }, token: string | null) {
   // IMPORTANT: Send status exactly as database ENUM expects
   const res = await fetch(`${base}/create`, {
     method: 'POST',
-    headers: authHeaders(),
+    headers: authHeaders(token),
+    credentials: "include",
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -48,11 +48,12 @@ export async function updateProject(id: number, payload: {
   status: 'Planning' | 'In Progress' | 'Completed' | 'On Hold';
   startDate?: string; // yyyy-MM-dd
   endDate?: string;
-}) {
+}, token: string | null) {
   // IMPORTANT: Send status exactly as database ENUM expects
   const res = await fetch(`${base}/project/${id}`, {
     method: 'PUT',
-    headers: authHeaders(),
+    headers: authHeaders(token),
+    credentials: "include",
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -63,10 +64,11 @@ export async function updateProject(id: number, payload: {
 }
 
 // DELETE PROJECT
-export async function deleteProject(id: number) {
+export async function deleteProject(id: number, token: string | null) {
   const res = await fetch(`${base}/project/${id}`, { 
     method: 'DELETE',
-    headers: authHeaders() 
+    headers: authHeaders(token),
+    credentials: "include", 
   });
   if (!res.ok) throw new Error('Failed to delete project');
 }

@@ -1,5 +1,6 @@
 import { createProject } from "../../../services/projects/ProjectsService";
 import type { CreateProjectActionState } from "../../../types/state-types/CreateProjectActionState";
+import { useAuth } from "../../../context/AuthContext";
 
 export async function CreateProjectAction(
   prevState: CreateProjectActionState,
@@ -7,6 +8,8 @@ export async function CreateProjectAction(
 ): Promise<CreateProjectActionState> {
 
   await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  const {token} = useAuth();
 
   const projName = formData.get("projName")?.toString().trim() ?? "";
   const projDescription = formData.get("projDescription")?.toString().trim() ?? "";
@@ -57,7 +60,7 @@ export async function CreateProjectAction(
     status,
     startDate,
     endDate,
-  });
+  }, token);
 
   return { success: true };
 }

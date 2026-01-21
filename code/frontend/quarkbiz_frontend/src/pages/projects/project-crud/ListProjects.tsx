@@ -4,8 +4,11 @@ import { SearchContext } from "../Projects";
 import ViewProjectCard from "./project-cards/ViewProjectCard";
 import "../.././../styles/projects/ListProjects.css";
 import type { Project } from "../../../types/entity-types/Project";
+import { useAuth } from "../../../context/AuthContext";
 
 function ListProjects() {
+
+  const {token} = useAuth();
 
   // states
   const [projects, setProjects] = useState<Project[]>([]);
@@ -21,7 +24,7 @@ function ListProjects() {
 
   // load projects from database
   const loadProjects = async () => {
-    const projectsData = await fetchProjects();
+    const projectsData = await fetchProjects(token);
     setProjects(projectsData);
   };
 
